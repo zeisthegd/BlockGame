@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MoveablePiece : MonoBehaviour
+public class MoveableBlock : MonoBehaviour
 {
     [SerializeField] float moveAnimDuration;
-    GamePiece piece;
+    Block block;
 
     void Awake()
     {
-        piece = GetComponent<GamePiece>();
+        block = GetComponent<Block>();
     }
     void Start()
     {
@@ -23,9 +23,9 @@ public class MoveablePiece : MonoBehaviour
 
     IEnumerator MoveCoroutine(int _newX, int _newY)
     {
-        piece.gameObject.name = piece.PieceSprite.Type.ToString() + $" [{_newX},{_newY}]"; 
-        piece.X = _newX;
-        piece.Y = _newX;
+        block.gameObject.name = block.Sprite.Type.ToString() + $" [{_newX},{_newY}]"; 
+        block.X = _newX;
+        block.Y = _newY;
 
         float time = 0;
         while (time <= 1)
@@ -34,5 +34,6 @@ public class MoveablePiece : MonoBehaviour
             time += Time.deltaTime * 1 / moveAnimDuration;
             transform.position = Vector3.Lerp(transform.position, new Vector3(_newX, _newY, 0), time);
         }
+        block.DeactiveChosenUI();
     }
 }

@@ -7,27 +7,30 @@ public class Grid : MonoBehaviour
     [SerializeField] int xDimension = 1;
     [SerializeField] int yDimension = 1;
     [SerializeField] float fillTime = 1;
-    [SerializeField] PiecePrefab[] piecePrefabs;
+    [SerializeField] BlockPrefab[] blockPrefabs;
     [SerializeField] GameObject[] backGroundTile;
 
-    GamePiece[,] pieces;
-    PiecesMatcher piecesMatcher;
+    Block[,] blocks;
+    BlocksMatcher blocksMatcher;
 
-
+    void Awake()
+    {
+        blocksMatcher = GetComponent<BlocksMatcher>();
+    }
     void Start()
     {
-        InstantiatePieceBackground();
+        InstantiateBlockBackground();
         StartNewGame();
     }
 
     public void StartNewGame()
     {
         ClearBoard();
-        InstantiatePieces();
+        InstantiateBlocks();
         StartCoroutine(Fill());
     }
 
-    void InstantiatePieceBackground()
+    void InstantiateBlockBackground()
     {
         for (int i = 0; i < xDimension; i++)
         {
@@ -39,15 +42,15 @@ public class Grid : MonoBehaviour
         }
     }
 
-    void InstantiatePieces()
+    void InstantiateBlocks()
     {
-        pieces = new GamePiece[xDimension, yDimension];
+        blocks = new Block[xDimension, yDimension];
         Vector2 randStartPos = new Vector2(Random.Range(0, xDimension), Random.Range(0, xDimension));
         for (int i = 0; i < xDimension; i++)
         {
             for (int j = 0; j < yDimension; j++)
             {
-                SpawnNewPiece(i, j, PieceMode.EMPTY);
+                SpawnNewBlock(i, j, BlockMode.NORMAL);
             }
         }
     }
@@ -71,11 +74,11 @@ public class Grid : MonoBehaviour
         int topRow = yDimension - 1;
         for (int i = 0; i < xDimension; i++)
         {
-            GamePiece topPiece = pieces[i, topRow];
-            if (topPiece.Mode == PieceMode.EMPTY)
+            Block topBlock = blocks[i, topRow];
+            if (topBlock.Mode == BlockMode.EMPTY)
             {
-                Destroy(topPiece.gameObject);
-                SpawnNewPiece(i, topRow, PieceMode.NORNAL, new Vector2(i, topRow + 2));
+                Destroy(topBlock.gameObject);
+                SpawnNewBlock(i, topRow, BlockMode.NORMAL, new Vector2(i, topRow + 2));
                 filled = true;
             }
         }
@@ -89,16 +92,16 @@ public class Grid : MonoBehaviour
         {
             for (int i = 0; i < xDimension; i++)
             {
-                GamePiece piece = pieces[i, j];
-                if (piece.Moveable())
+                Block block = blocks[i, j];
+                if (block.Moveable())
                 {
-                    GamePiece pieceBelow = pieces[i, j - 1];
-                    if (pieceBelow.Mode == PieceMode.EMPTY)
+                    Block blockBelow = blocks[i, j - 1];
+                    if (blockBelow.Mode == BlockMode.EMPTY)
                     {
-                        Destroy(pieceBelow.gameObject);
-                        piece.MoveableComponent.Move(i, j - 1);
-                        pieces[i, j - 1] = piece;
-                        SpawnNewPiece(i, j, PieceMode.EMPTY);
+                        Destroy(blockBelow.gameObject);
+                        block.MoveableComponent.Move(i, j - 1);
+                        blocks[i, j - 1] = block;
+                        SpawnNewBlock(i, j, BlockMode.EMPTY);
                         filled = true;
                     }
                 }
@@ -107,51 +110,49 @@ public class Grid : MonoBehaviour
         return filled;
     }
 
-    public GamePiece SpawnNewPiece(int x, int y, PieceMode mode)
+    public Block SpawnNewBlock(int x, int y, BlockMode mode)
     {
-        return SpawnNewPiece(x, y, mode, new Vector2(x, y));
+        return SpawnNewBlock(x, y, mode, new Vector2(x, y));
     }
 
-    public GamePiece SpawnNewPiece(int x, int y, PieceMode mode, Vector2 position)
+    public Block SpawnNewBlock(int x, int y, BlockMode mode, Vector2 position)
     {
-        GameObject newPiece = Instantiate(piecePrefabs[(int)mode].prefab, position, Quaternion.identity);
-        GamePiece pieceScript = newPiece.GetComponent<GamePiece>();
-        pieceScript.Init(x, y, this, mode);
+        GameObject newBlock = Instantiate(blockPrefabs[(int)mode].prefab, position, Quaternion.identity);
+        Block blockscript = newBlock.GetComponent<Block>();
+        blockscript.Init(x, y, this, mode);
 
-        if (mode == PieceMode.NORNAL)
+        if (mode == BlockMode.NORMAL)
         {
-            pieceScript.PieceSprite.SetType((PieceSprite.PieceType)Random.Range(0, pieceScript.PieceSprite.TypeCount));
-            pieceScript.MoveableComponent.Move(pieceScript.X, pieceScript.Y);
-            newPiece.name = pieceScript.PieceSprite.Type.ToString() + $" [{x},{y}]";
+            blockscript.Sprite.SetType((BlockType)Random.Range(0, blockscript.Sprite.TypeCount));
+            blockscript.MoveableComponent.Move(blockscript.X, blockscript.Y);
+            newBlock.name = blockscript.Sprite.Type.ToString() + $" [{x},{y}]";
         }
-        else newPiece.name = $"EMPTY [{x},{y}]";
+        else newBlock.name = $"EMPTY [{x},{y}]";
 
-        newPiece.transform.parent = this.transform;
-        pieces[x, y] = pieceScript;
+        newBlock.transform.parent = this.transform;
+        blocks[x, y] = blockscript;
 
-        return pieceScript;
+        return blockscript;
     }
 
     private void ClearBoard()
     {
-        var pieces = FindObjectsOfType<GamePiece>();
-        foreach (GamePiece piece in pieces)
+        var blocks = FindObjectsOfType<Block>();
+        foreach (Block block in blocks)
         {
-            Destroy(piece.gameObject);
+            Destroy(block.gameObject);
         }
     }
-
-    public PiecesMatcher PiecesMatcher { get => piecesMatcher; }
-    public GamePiece[,] Pieces { get => pieces;  }
+    public Block[,] Blocks { get => blocks; }
+    public BlocksMatcher BlocksMatcher { get => blocksMatcher; }
+    public int XDimension { get => xDimension; }
+    public int YDimension { get => yDimension; }
 
     [System.Serializable]
-    public struct PiecePrefab
+    public struct BlockPrefab
     {
-        public PieceMode mode;
+        public BlockMode mode;
         public GameObject prefab;
     }
-
-
-
 }
 
