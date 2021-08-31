@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class MainUI : MonoBehaviour
 {
+    [Header("--- Child UIs ---")]
     [SerializeField] GameObject pauseMenuUI;
     public bool gameIsPaused;
     void Start()

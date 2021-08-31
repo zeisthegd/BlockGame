@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class MoveableBlock : MonoBehaviour
 {
+    [Header("--- Animation ---")]
     [SerializeField] float moveAnimDuration;
     Block block;
 
@@ -11,11 +12,6 @@ public class MoveableBlock : MonoBehaviour
     {
         block = GetComponent<Block>();
     }
-    void Start()
-    {
-
-    }
-
     public void Move(int _newX, int _newY)
     {
         StartCoroutine(MoveCoroutine(_newX, _newY));

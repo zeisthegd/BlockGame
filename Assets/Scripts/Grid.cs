@@ -4,9 +4,12 @@ using UnityEngine;
 
 public class Grid : MonoBehaviour
 {
+    [Header("--- Grid Settings ---")]
     [SerializeField] int xDimension = 1;
     [SerializeField] int yDimension = 1;
     [SerializeField] float fillTime = 1;
+
+    [Header("--- Prefabs ---")]
     [SerializeField] BlockPrefab[] blockPrefabs;
     [SerializeField] GameObject[] backGroundTile;
 
@@ -50,7 +53,7 @@ public class Grid : MonoBehaviour
         {
             for (int j = 0; j < yDimension; j++)
             {
-                SpawnNewBlock(i, j, BlockMode.NORMAL);
+                SpawnNewBlock(i, j, BlockMode.NORMAL,randStartPos);
             }
         }
     }
@@ -58,15 +61,15 @@ public class Grid : MonoBehaviour
     public IEnumerator Fill()
     {
         bool needRefill = true;
-        while(needRefill)
+        while (needRefill)
         {
-            while(FillBoard())
-            {   
+            yield return new WaitForSeconds(fillTime);
+            while (FillBoard())
+            {
                 yield return new WaitForSeconds(fillTime);
             }
             needRefill = blocksMatcher.ClearAllValidMatches();
         }
-
     }
     public bool FillBoard()
     {
@@ -143,9 +146,11 @@ public class Grid : MonoBehaviour
 
     private void ClearBoard()
     {
+        StopAllCoroutines();
+        blocksMatcher.Reset();
         var blocks = FindObjectsOfType<Block>();
         foreach (Block block in blocks)
-        {
+        {   
             Destroy(block.gameObject);
         }
     }

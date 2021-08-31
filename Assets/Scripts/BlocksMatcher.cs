@@ -59,7 +59,7 @@ public class BlocksMatcher : MonoBehaviour
             _blockB.MoveableComponent.Move(blockAX, blockAY);
 
             blocksToSwap.Clear();
-            if (GetMatch(_blockA, _blockA.X, _blockA.Y).Count < 3 || GetMatch(_blockB, _blockB.X, _blockB.Y).Count < 3)
+            if (GetMatch(_blockA, _blockA.X, _blockA.Y).Count < 3 && GetMatch(_blockB, _blockB.X, _blockB.Y).Count < 3)
             {
                 blockAX = _blockA.X;
                 blockAY = _blockA.Y;
@@ -69,16 +69,6 @@ public class BlocksMatcher : MonoBehaviour
                 grid.Blocks[_blockB.X, _blockB.Y] = _blockB;
             }
         }
-    }
-
-    public void ClearMatchedBlocks()
-    {
-        foreach (Block block in matchedBlocks)
-        {
-            Debug.Log(block.Name);
-            block.ClearableComponent.Clear();
-        }
-        matchedBlocks.Clear();
     }
 
     public bool ClearAllValidMatches()
@@ -103,13 +93,12 @@ public class BlocksMatcher : MonoBehaviour
         foreach (Block block in matchedBlocks)
         {
             block.ClearableComponent.Clear();
-        }   
+        }
         return cleared;
     }
 
     public List<Block> GetMatch(Block _block, int _newX, int _newY)
     {
-        Debug.Log("Finding at: " + _block.Name);
         List<Block> matchingBlocks = new List<Block>();
         if (_block.Mode == BlockMode.NORMAL)
         {
@@ -117,8 +106,10 @@ public class BlocksMatcher : MonoBehaviour
             List<Block> horizontalBlocks = GetHorizontalBlocks(_block);
             List<Block> verticalBlocks = GetVerticalBlocks(_block);
 
-            AddFoundBlocksTo(matchingBlocks, horizontalBlocks);
-            AddFoundBlocksTo(matchingBlocks, verticalBlocks);
+            if (horizontalBlocks.Count >= 3)
+                AddFoundBlocksTo(matchingBlocks, horizontalBlocks);
+            if (verticalBlocks.Count >= 3)
+                AddFoundBlocksTo(matchingBlocks, verticalBlocks);
         }
         return matchingBlocks;
     }
@@ -185,5 +176,11 @@ public class BlocksMatcher : MonoBehaviour
         || (Mathf.Abs(_blockA.Y - _blockB.Y) == 1) && _blockA.X == _blockB.X)
             return true;
         return false;
+    }
+
+    public void Reset()
+    {
+        matchedBlocks.Clear();
+        blocksToSwap.Clear();
     }
 }

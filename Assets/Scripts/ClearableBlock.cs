@@ -4,9 +4,16 @@ using UnityEngine;
 
 public class ClearableBlock : MonoBehaviour
 {
+    [Header("--- Animation ---")]
     [SerializeField] AnimationClip clearAnim;
     [SerializeField] Animator animator;
+
+    [Header("--- VFX ---")]
     [SerializeField] GameObject clearEffect;
+
+    [Header("--- Audio ---")]
+    [SerializeField] AudioSource sfxSource;
+    [SerializeField] AudioClip clearSound;
 
     Block block;
 
@@ -18,8 +25,6 @@ public class ClearableBlock : MonoBehaviour
     {
         StartCoroutine(ClearAnimationCoroutine());
         StartCoroutine(PlayClearEffect());
-        block.Grid.SpawnNewBlock(block.X, block.Y, BlockMode.EMPTY);
-        
     }
 
     IEnumerator ClearAnimationCoroutine()
@@ -31,12 +36,21 @@ public class ClearableBlock : MonoBehaviour
     IEnumerator PlayClearEffect()
     {
         List<ParticleSystem> clearEffect = GetClearParticles();
+        PlayClearSound();
         foreach (ParticleSystem particle in clearEffect)
         {
             particle.Play();
         }
-        yield return new WaitForSeconds(0.3F);
-        Destroy(this.gameObject);
+
+        yield return new WaitForSeconds(.3F);
+        Destroy(block.gameObject);
+        block.Grid.SpawnNewBlock(block.X, block.Y, BlockMode.EMPTY);
+    }
+
+    private void PlayClearSound()
+    {
+        sfxSource.clip = clearSound;
+        sfxSource.Play();
     }
 
     List<ParticleSystem> GetClearParticles()
