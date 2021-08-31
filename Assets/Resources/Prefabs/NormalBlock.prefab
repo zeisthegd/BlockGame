@@ -171,7 +171,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ea96d635bc630b7489b6c37eba5bef20, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveAnimDuration: 0.2
+  moveAnimDuration: 0.25
 --- !u!114 &728200789910253972
 MonoBehaviour:
   m_ObjectHideFlags: 0

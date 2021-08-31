@@ -5,10 +5,10 @@ using UnityEngine;
 public class BlocksMatcher : MonoBehaviour
 {
     Grid grid;
-    List<Block> blocksToSwap = new List<Block>();
     int[] checkDirections = new int[] { -1, 1 };
-
     List<Block> matchedBlocks = new List<Block>();
+    List<Block> blocksToSwap = new List<Block>();
+
     void Awake()
     {
         grid = GetComponent<Grid>();
@@ -31,7 +31,7 @@ public class BlocksMatcher : MonoBehaviour
         if (blocksToSwap.Count == 2)
         {
             SwapBlocks(blocksToSwap[0], blocksToSwap[1]);
-            ClearMatchedBlocks();
+            ClearAllValidMatches();
             StartCoroutine(grid.Fill());
         }
     }
@@ -50,7 +50,6 @@ public class BlocksMatcher : MonoBehaviour
     {
         if (IsAdjacent(_blockA, _blockB))
         {
-            //Swap board data and position
             grid.Blocks[_blockA.X, _blockA.Y] = _blockB;
             grid.Blocks[_blockB.X, _blockB.Y] = _blockA;
 
@@ -60,18 +59,8 @@ public class BlocksMatcher : MonoBehaviour
             _blockB.MoveableComponent.Move(blockAX, blockAY);
 
             blocksToSwap.Clear();
-            var matchedABlocks = GetMatch(_blockA, _blockA.X, _blockA.Y);
-            var matchedBBlocks = GetMatch(_blockB, _blockB.X, _blockB.Y);
-
-            if (matchedABlocks.Count >= 3)
+            if (GetMatch(_blockA, _blockA.X, _blockA.Y).Count < 3 || GetMatch(_blockB, _blockB.X, _blockB.Y).Count < 3)
             {
-                AddFoundBlocksTo(matchedBlocks, matchedABlocks);
-                if (matchedBBlocks.Count >= 3)
-                    AddFoundBlocksTo(matchedBlocks, matchedBBlocks);
-            }
-            else
-            {
-                //Reset board data and position
                 blockAX = _blockA.X;
                 blockAY = _blockA.Y;
                 _blockA.MoveableComponent.Move(_blockB.X, _blockB.Y);
@@ -89,6 +78,33 @@ public class BlocksMatcher : MonoBehaviour
             Debug.Log(block.Name);
             block.ClearableComponent.Clear();
         }
+        matchedBlocks.Clear();
+    }
+
+    public bool ClearAllValidMatches()
+    {
+        bool cleared = false;
+        matchedBlocks.Clear();
+        for (int i = 0; i < grid.XDimension; i++)
+        {
+            for (int j = 0; j < grid.YDimension; j++)
+            {
+                if (grid.Blocks[i, j].ClearableComponent != null)
+                {
+                    List<Block> matches = GetMatch(grid.Blocks[i, j], i, j);
+                    if (matches.Count >= 3)
+                    {
+                        AddFoundBlocksTo(matchedBlocks, matches);
+                        cleared = true;
+                    }
+                }
+            }
+        }
+        foreach (Block block in matchedBlocks)
+        {
+            block.ClearableComponent.Clear();
+        }   
+        return cleared;
     }
 
     public List<Block> GetMatch(Block _block, int _newX, int _newY)
@@ -156,6 +172,8 @@ public class BlocksMatcher : MonoBehaviour
                 {
                     blocks.Add(foundBlock);
                 }
+                else
+                    return blocks;
             }
         }
         return blocks;

@@ -57,10 +57,16 @@ public class Grid : MonoBehaviour
 
     public IEnumerator Fill()
     {
-        while (FillBoard())
+        bool needRefill = true;
+        while(needRefill)
         {
-            yield return new WaitForSeconds(fillTime);
+            while(FillBoard())
+            {   
+                yield return new WaitForSeconds(fillTime);
+            }
+            needRefill = blocksMatcher.ClearAllValidMatches();
         }
+
     }
     public bool FillBoard()
     {
