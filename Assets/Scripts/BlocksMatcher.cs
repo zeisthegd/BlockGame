@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class BlocksMatcher : MonoBehaviour
 {
@@ -8,6 +9,10 @@ public class BlocksMatcher : MonoBehaviour
     int[] checkDirections = new int[] { -1, 1 };
     List<Block> matchedBlocks = new List<Block>();
     List<Block> blocksToSwap = new List<Block>();
+
+
+    public event UnityAction BeginClearingBlocks;
+    public event UnityAction BeginSwappingBlocks;
 
     void Awake()
     {
@@ -48,6 +53,7 @@ public class BlocksMatcher : MonoBehaviour
 
     public void SwapBlocks(Block _blockA, Block _blockB)
     {
+        BeginSwappingBlocks?.Invoke();
         if (IsAdjacent(_blockA, _blockB))
         {
             grid.Blocks[_blockA.X, _blockA.Y] = _blockB;
@@ -90,6 +96,8 @@ public class BlocksMatcher : MonoBehaviour
                 }
             }
         }
+        if (cleared)
+            BeginClearingBlocks?.Invoke();
         foreach (Block block in matchedBlocks)
         {
             block.ClearableComponent.Clear();
@@ -183,4 +191,6 @@ public class BlocksMatcher : MonoBehaviour
         matchedBlocks.Clear();
         blocksToSwap.Clear();
     }
+    public List<Block> MatchedBlocks { get => matchedBlocks; }
+
 }

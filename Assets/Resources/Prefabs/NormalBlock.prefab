@@ -70,12 +70,12 @@ SpriteRenderer:
   m_SortingLayerID: 1131726885
   m_SortingLayer: 3
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 0de9839d6ea3ce841b9663130c44f38f, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 08d7d2578ab259d408344b41d7d40fb6, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 1.05, y: 0.63}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -96,7 +96,6 @@ GameObject:
   - component: {fileID: 728200789910253972}
   - component: {fileID: 1562237940}
   - component: {fileID: 168795661}
-  - component: {fileID: 5639700041282995848}
   m_Layer: 0
   m_Name: NormalBlock
   m_TagString: Untagged
@@ -147,19 +146,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   typeSprites:
   - type: 0
-    sprite: {fileID: 21300000, guid: 4fdae8a63b444c54aaee914bae27d5e2, type: 3}
+    sprite: {fileID: 21300000, guid: 08d7d2578ab259d408344b41d7d40fb6, type: 3}
   - type: 1
-    sprite: {fileID: 21300000, guid: e27859f92367e8d4fa5baa6eb9adace6, type: 3}
+    sprite: {fileID: 21300000, guid: dfd761479895e3a47a680471adcaa4d6, type: 3}
   - type: 2
-    sprite: {fileID: 21300000, guid: c31a016621b0d964c88a94cc7421e36c, type: 3}
+    sprite: {fileID: 21300000, guid: 2d5b2b79dbd20b54ca90c33f0443f11b, type: 3}
   - type: 3
-    sprite: {fileID: 21300000, guid: 530fdf84f05b0694693db1e626c7cf3d, type: 3}
+    sprite: {fileID: 21300000, guid: 33a3ad1ada27e1d4091690fc693ed1b7, type: 3}
   - type: 4
-    sprite: {fileID: 21300000, guid: 3ccd7c6c64a71ad418fbbc7ed14a94ed, type: 3}
+    sprite: {fileID: 21300000, guid: 63b689c5b11b825479b8887460784b9d, type: 3}
   - type: 5
-    sprite: {fileID: 21300000, guid: 7bbab2243bb4a384eb2d9c73c40a1c5a, type: 3}
+    sprite: {fileID: 21300000, guid: 2a18be2efa29d4a419b04835fa2e332d, type: 3}
   - type: 6
-    sprite: {fileID: 21300000, guid: 0de9839d6ea3ce841b9663130c44f38f, type: 3}
+    sprite: {fileID: 21300000, guid: 8128323166df6ef4cbd86bc1bda872a7, type: 3}
 --- !u!114 &5238981085539031020
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -189,8 +188,6 @@ MonoBehaviour:
   animator: {fileID: 168795661}
   clearEffect: {fileID: 8420273520918717646, guid: cea70bea4f818e842ae8293c57e3123d,
     type: 3}
-  sfxSource: {fileID: 5639700041282995848}
-  clearSound: {fileID: 8300000, guid: 90eae78e8ce85a849b5b0ca11b2de641, type: 3}
 --- !u!61 &1562237940
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -236,102 +233,6 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
---- !u!82 &5639700041282995848
-AudioSource:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3538465612510538860}
-  m_Enabled: 1
-  serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 0}
-  m_PlayOnAwake: 0
-  m_Volume: 0.2
-  m_Pitch: 1
-  Loop: 0
-  Mute: 0
-  Spatialize: 0
-  SpatializePostEffects: 0
-  Priority: 128
-  DopplerLevel: 1
-  MinDistance: 1
-  MaxDistance: 500
-  Pan2D: 0
-  rolloffMode: 0
-  BypassEffects: 0
-  BypassListenerEffects: 0
-  BypassReverbZones: 0
-  rolloffCustomCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 1
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  panLevelCustomCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  spreadCustomCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  reverbZoneMixCustomCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
 --- !u!1 &4606489320511605304
 GameObject:
   m_ObjectHideFlags: 0
@@ -348,7 +249,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &3025930748906079949
 Transform:
   m_ObjectHideFlags: 0
@@ -402,12 +303,12 @@ SpriteRenderer:
   m_SortingLayerID: 1149483639
   m_SortingLayer: 2
   m_SortingOrder: 1
-  m_Sprite: {fileID: 21300000, guid: 61f9d634f35f2904d8ffc4d23a874386, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Sprite: {fileID: 21300000, guid: 3161f5701301ed34aba74be48fe88db9, type: 3}
+  m_Color: {r: 0.028301895, g: 0.023676319, b: 0.019891426, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 1.28, y: 1.28}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1

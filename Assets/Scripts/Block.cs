@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class Block : MonoBehaviour
 {
+    public static bool canPress = true;
     private int x;
     private int y;
     private Grid grid;
@@ -35,7 +36,8 @@ public class Block : MonoBehaviour
 
     void OnMouseDown()
     {
-        grid.BlocksMatcher.PressedBlock(this);
+        if(canPress)
+            grid.BlocksMatcher.PressedBlock(this);
     }
 
     public bool Moveable()

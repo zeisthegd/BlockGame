@@ -43,11 +43,12 @@ public class BlockSprite : MonoBehaviour
 
 public enum BlockType
 {
-    SANDWICH,
-    BURRITO,
-    CHEESECAKE,
-    JELLY,
-    STEAK,
-    ROASTEDCHICKEN,
-    APPLEPIE
+    MELON,
+    KIWI,
+    ORANGE,
+    APPLE,
+    PUMPKIN,
+    AVOCADO,
+    MUSHROOM,
+    NONE
 }

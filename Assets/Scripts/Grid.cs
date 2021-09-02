@@ -11,38 +11,31 @@ public class Grid : MonoBehaviour
 
     [Header("--- Prefabs ---")]
     [SerializeField] BlockPrefab[] blockPrefabs;
-    [SerializeField] GameObject[] backGroundTile;
 
     Block[,] blocks;
     BlocksMatcher blocksMatcher;
+    PointCalculator pointCalculator;
 
     void Awake()
     {
         blocksMatcher = GetComponent<BlocksMatcher>();
+        pointCalculator = GetComponent<PointCalculator>();
     }
     void Start()
     {
-        InstantiateBlockBackground();
         StartNewGame();
     }
 
     public void StartNewGame()
     {
+        MakeNewBoard();
+        pointCalculator.Reset();
+    }
+    public void MakeNewBoard()
+    {
         ClearBoard();
         InstantiateBlocks();
         StartCoroutine(Fill());
-    }
-
-    void InstantiateBlockBackground()
-    {
-        for (int i = 0; i < xDimension; i++)
-        {
-            for (int j = 0; j < yDimension; j++)
-            {
-                GameObject bgTile = Instantiate(backGroundTile[((i + j) % 2 == 0) ? 0 : 1], new Vector2(i, j), Quaternion.identity);
-                bgTile.transform.parent = this.transform.Find("BG");
-            }
-        }
     }
 
     void InstantiateBlocks()
@@ -53,7 +46,7 @@ public class Grid : MonoBehaviour
         {
             for (int j = 0; j < yDimension; j++)
             {
-                SpawnNewBlock(i, j, BlockMode.NORMAL,randStartPos);
+                SpawnNewBlock(i, j, BlockMode.NORMAL, randStartPos);
             }
         }
     }
@@ -69,6 +62,7 @@ public class Grid : MonoBehaviour
                 yield return new WaitForSeconds(fillTime);
             }
             needRefill = blocksMatcher.ClearAllValidMatches();
+            Block.canPress = !needRefill;
         }
     }
     public bool FillBoard()
@@ -150,7 +144,7 @@ public class Grid : MonoBehaviour
         blocksMatcher.Reset();
         var blocks = FindObjectsOfType<Block>();
         foreach (Block block in blocks)
-        {   
+        {
             Destroy(block.gameObject);
         }
     }
@@ -158,6 +152,7 @@ public class Grid : MonoBehaviour
     public BlocksMatcher BlocksMatcher { get => blocksMatcher; }
     public int XDimension { get => xDimension; }
     public int YDimension { get => yDimension; }
+    public PointCalculator PointCalculator { get => pointCalculator; }
 
     [System.Serializable]
     public struct BlockPrefab

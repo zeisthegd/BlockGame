@@ -11,10 +11,6 @@ public class ClearableBlock : MonoBehaviour
     [Header("--- VFX ---")]
     [SerializeField] GameObject clearEffect;
 
-    [Header("--- Audio ---")]
-    [SerializeField] AudioSource sfxSource;
-    [SerializeField] AudioClip clearSound;
-
     Block block;
 
     void Awake()
@@ -36,7 +32,6 @@ public class ClearableBlock : MonoBehaviour
     IEnumerator PlayClearEffect()
     {
         List<ParticleSystem> clearEffect = GetClearParticles();
-        PlayClearSound();
         foreach (ParticleSystem particle in clearEffect)
         {
             particle.Play();
@@ -45,12 +40,6 @@ public class ClearableBlock : MonoBehaviour
         yield return new WaitForSeconds(.3F);
         Destroy(block.gameObject);
         block.Grid.SpawnNewBlock(block.X, block.Y, BlockMode.EMPTY);
-    }
-
-    private void PlayClearSound()
-    {
-        sfxSource.clip = clearSound;
-        sfxSource.Play();
     }
 
     List<ParticleSystem> GetClearParticles()
