@@ -21,9 +21,10 @@ public class AudioPlayer : MonoBehaviour
     {
         grid = FindObjectOfType<Grid>();
     }
-    void OnEnable()
+    void Update()
     {
-        
+        if(!bgmSource.isPlaying)
+            PlayRandomBGM();
     }
     void Start()
     {
