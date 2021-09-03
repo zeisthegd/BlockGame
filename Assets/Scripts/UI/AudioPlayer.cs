@@ -32,11 +32,6 @@ public class AudioPlayer : MonoBehaviour
         DontDestroyOnLoad(this);
         PlayRandomBGM();
     }
-    void Update()
-    {
-        if ((int)(bgmSource.time - bgmSource.clip.length) == 2)
-            StartFade(bgmSource, 2, 0.5f);
-    }
     void OnDisable()
     {
         grid.BlocksMatcher.BeginClearingBlocks -= PlayClearSound;
@@ -64,19 +59,5 @@ public class AudioPlayer : MonoBehaviour
     void PlaySFX(AudioClip clip)
     {
         sfxSource.PlayOneShot(clip);
-    }
-    public IEnumerator StartFade(AudioSource audioSource, float duration, float targetVolume)
-    {
-        float currentTime = 0;
-        float start = audioSource.volume;
-
-        while (currentTime < duration)
-        {
-            currentTime += Time.deltaTime;
-            audioSource.volume = Mathf.Lerp(start, targetVolume, currentTime / duration);
-            yield return null;
-        }
-        PlayRandomBGM();
-        yield break;
     }
 }
