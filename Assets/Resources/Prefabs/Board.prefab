@@ -132,11 +132,11 @@ MonoBehaviour:
   fillTime: 0.5
   blockPrefabs:
   - mode: 0
-    prefab: {fileID: 2718652052889688984, guid: 6eac9b62b960bc347a1f6243130aea22,
-      type: 3}
+    prefab: {fileID: 760270687402569206, guid: e7b55b4a1ab19544b8badd3d92be8509, type: 3}
   - mode: 1
     prefab: {fileID: 3538465612510538860, guid: 345113300527e3044b7bf069d5708fe7,
       type: 3}
+  unlimitedTgl: {fileID: 0}
 --- !u!114 &1285770970
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -163,6 +163,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   totalPointsTxt: {fileID: 0}
   pointsToAddTxt: {fileID: 0}
+  match3Point: 160
   addDuration: 100
-  match3Point: 180
-  multiplierAfter3Spree: 80
+  bonusAfter3Spree: 80
+  totalMatchesBonus: 20
