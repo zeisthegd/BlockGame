@@ -187,6 +187,7 @@ public class BlocksMatcher : MonoBehaviour
 
     public void Reset()
     {
+        StopAllCoroutines();
         matchedBlocks.Clear();
         blocksToSwap.Clear();
     }

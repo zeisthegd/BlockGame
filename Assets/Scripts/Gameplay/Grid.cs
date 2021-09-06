@@ -14,9 +14,6 @@ public class Grid : MonoBehaviour
     [Header("--- Prefabs ---")]
     [SerializeField] BlockPrefab[] blockPrefabs;
 
-    [Header("--- Config From UI ---")]
-    [SerializeField] Toggle unlimitedTgl;
-
 
     Block[,] blocks;
     BlocksMatcher blocksMatcher;
@@ -43,7 +40,6 @@ public class Grid : MonoBehaviour
     {
         ClearBoard();
         InstantiateBlocks();
-        StartCoroutine(Fill());
     }
 
     void InstantiateBlocks()
@@ -87,7 +83,7 @@ public class Grid : MonoBehaviour
         for (int i = 0; i < xDimension; i++)
         {
             Block topBlock = blocks[i, topRow];
-            if (topBlock.Mode == BlockMode.EMPTY && unlimitedTgl.isOn)
+            if (topBlock.Mode == BlockMode.EMPTY)
             {
                 Destroy(topBlock.gameObject);
                 SpawnNewBlock(i, topRow, BlockMode.NORMAL, new Vector2(i, topRow + 2));
