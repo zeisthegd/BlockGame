@@ -3,22 +3,43 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
+/// <summary>
+/// Search for matches.
+/// </summary>
 public class BlocksMatcher : MonoBehaviour
 {
-    Grid grid;
+    Grid grid;// Grid that store blocks data.
+    List<Block> matchedBlocks = new List<Block>();// Hold the matches that the functions have found.
+    List<Block> blocksToSwap = new List<Block>();// Holds the 2 blocks that is going to be swapped.
+
+    // Add 1 of these value to X or Y position of the block to search.
+    //-1 means searching left and down if add to X, 1 means searching right and up if add to Y.
     int[] checkDirections = new int[] { -1, 1 };
-    List<Block> matchedBlocks = new List<Block>();
-    List<Block> blocksToSwap = new List<Block>();
 
 
-    public event UnityAction BeginClearingBlocks;
-    public event UnityAction BeginSwappingBlocks;
+    public event UnityAction BeginClearingBlocks;// Called when there are matches to clear.
+    public event UnityAction BeginSwappingBlocks;// Called when 2 blocks is swapped.
 
     void Awake()
     {
         grid = GetComponent<Grid>();
     }
 
+    void Start()
+    {
+        GameManager.Instance.RestartGame += Reset;
+    }
+    void OnDisable()
+    {
+        GameManager.Instance.RestartGame -= Reset;
+    }
+
+    /// <summary>
+    /// Called when a block is pressed. Add the pressed block to the blocksToSwap list if it is unique.
+    /// If it is not unique, it will be released.
+    /// When 2 blocks have been added, they will be swapped.
+    /// </summary>
+    /// <param name="block">Pressed block</param>
     public void PressedBlock(Block block)
     {
         if (!blocksToSwap.Contains(block))
@@ -26,10 +47,10 @@ public class BlocksMatcher : MonoBehaviour
             if (blocksToSwap.Count == 1)
                 if (!IsAdjacent(blocksToSwap[0], block))
                 {
-                    Debug.Log("2 Blocks not adjacent!");
+                    Debug.Log("These 2 Blocks are not adjacent!");
                     return;
                 }
-            Chooseblock(block);
+            ChooseBlock(block);
         }
         else
             Releaseblock(block);
@@ -40,42 +61,66 @@ public class BlocksMatcher : MonoBehaviour
             StartCoroutine(grid.Fill());
         }
     }
-    public void Chooseblock(Block block)
+
+    ///<summary>
+    /// Add the block to the blocksToSwap list, show the chosen UI sprite of the block
+    ///</summary>
+    ///<param name="block">Block</params>
+    public void ChooseBlock(Block block)
     {
         blocksToSwap.Add(block);
         block.ActiveChosenUI();
     }
+
+    ///<summary>
+    /// Remove the block to the blocksToSwap list, hide the chosen UI sprite of the block
+    ///</summary>
+    ///<param name="block">Block</params>
     public void Releaseblock(Block block)
     {
         blocksToSwap.Remove(block);
         block.DeactiveChosenUI();
     }
 
+    ///<summary>
+    /// Swap chosen blocks positions if their new positions make matches.Finally, clear the blocksToSwap list.
+    ///</summary>
+    ///<param name="blockA">Block A</params>
+    ///<param name="blockB">Block B</params>
     public void SwapBlocks(Block blockA, Block blockB)
     {
         BeginSwappingBlocks?.Invoke();
         if (IsAdjacent(blockA, blockB))
         {
-            SwapPositions(blockA, blockB);
             bool bothAandBNotEmpty = blockA.Sprite.Type != BlockType.NONE && blockB.Sprite.Type != BlockType.NONE;
-            if (GetMatch(blockA, blockA.X, blockA.Y).Count < 3 && GetMatch(blockB, blockB.X, blockB.Y).Count < 3 && bothAandBNotEmpty)
+            SwapPositions(blockA, blockB);
+            if (GetMatch(blockA).Count < 3 && GetMatch(blockB).Count < 3 && bothAandBNotEmpty)
             {
+                //Swap back if new positions not making any matches.
                 SwapPositions(blockB, blockA);
             }
         }
         blocksToSwap.Clear();
     }
 
-    private void SwapPositions(Block _blockA, Block _blockB)
+    ///<summary>
+    /// Swap 2 blocks position in 3D space and in grid data.
+    ///</summary>
+    ///<param name="blockA">Block A</params>
+    ///<param name="blockB">Block B</params>
+    private void SwapPositions(Block blockA, Block blockB)
     {
-        int blockAX = _blockA.X;
-        int blockAY = _blockA.Y;
-        grid.Blocks[_blockA.X, _blockA.Y] = _blockB;
-        grid.Blocks[_blockB.X, _blockB.Y] = _blockA;
-        _blockA.MoveableComponent.Move(_blockB.X, _blockB.Y);
-        _blockB.MoveableComponent.Move(blockAX, blockAY);
+        int blockAX = blockA.X;
+        int blockAY = blockA.Y;
+        grid.Blocks[blockA.X, blockA.Y] = blockB;
+        grid.Blocks[blockB.X, blockB.Y] = blockA;
+        blockA.MoveableComponent.Move(blockB.X, blockB.Y);
+        blockB.MoveableComponent.Move(blockAX, blockAY);
     }
 
+    ///<summary>
+    /// Search through all the blocks of the grid, find matches to clear.
+    ///</summary>
     public bool ClearAllValidMatches()
     {
         bool cleared = false;
@@ -86,7 +131,7 @@ public class BlocksMatcher : MonoBehaviour
             {
                 if (grid.Blocks[i, j].ClearableComponent != null)
                 {
-                    List<Block> matches = GetMatch(grid.Blocks[i, j], i, j);
+                    List<Block> matches = GetMatch(grid.Blocks[i, j]);
                     if (matches.Count >= 3)
                     {
                         AddFoundBlocksTo(matchedBlocks, matches);
@@ -104,14 +149,19 @@ public class BlocksMatcher : MonoBehaviour
         return cleared;
     }
 
-    public List<Block> GetMatch(Block _block, int _newX, int _newY)
+    /// <summary>
+    /// Get all blocks of the same type of the chosen blocks in all 4 directions
+    /// </summary>
+    /// <param name="block"></param>
+    /// <returns></returns>
+    public List<Block> GetMatch(Block block)
     {
         List<Block> matchingBlocks = new List<Block>();
-        if (_block.Mode == BlockMode.NORMAL)
+        if (block.State == BlockState.NORMAL)
         {
-            BlockType type = _block.Sprite.Type;
-            List<Block> horizontalBlocks = GetHorizontalBlocks(_block);
-            List<Block> verticalBlocks = GetVerticalBlocks(_block);
+            BlockType type = block.Sprite.Type;
+            List<Block> horizontalBlocks = GetHorizontalBlocks(block);
+            List<Block> verticalBlocks = GetVerticalBlocks(block);
 
             if (horizontalBlocks.Count >= 3)
                 AddFoundBlocksTo(matchingBlocks, horizontalBlocks);
@@ -121,25 +171,36 @@ public class BlocksMatcher : MonoBehaviour
         return matchingBlocks;
     }
 
-    private List<Block> GetHorizontalBlocks(Block _block)
+    /// <summary>
+    /// Get all blocks of the same type of the chosen blocks in 2 directions: Left and Right.
+    /// </summary>
+    /// <param name="block">Chosen block</param>
+    /// <returns></returns>
+    private List<Block> GetHorizontalBlocks(Block block)
     {
         List<Block> horizontalBlocks = new List<Block>();
 
-        horizontalBlocks.Add(_block);
-        var leftBlocks = GetBlocksInDirection(_block, checkDirections[0], checkDirections[0], 0, _block.Y);
-        var rightBlocks = GetBlocksInDirection(_block, checkDirections[1], checkDirections[1], grid.XDimension - 1, _block.Y);
+        horizontalBlocks.Add(block);
+        var leftBlocks = GetBlocksInDirection(block, checkDirections[0], checkDirections[0], 0, block.Y);
+        var rightBlocks = GetBlocksInDirection(block, checkDirections[1], checkDirections[1], grid.XDimension - 1, block.Y);
 
         AddFoundBlocksTo(horizontalBlocks, leftBlocks);
         AddFoundBlocksTo(horizontalBlocks, rightBlocks);
         return horizontalBlocks;
     }
-    private List<Block> GetVerticalBlocks(Block _block)
+
+    /// <summary>
+    /// Get all blocks of the same type of the chosen blocks in 2 directions: Up and Down.
+    /// </summary>
+    /// <param name="block">Chosen block</param>
+    /// <returns></returns>
+    private List<Block> GetVerticalBlocks(Block block)
     {
         List<Block> verticalBlocks = new List<Block>();
 
-        verticalBlocks.Add(_block);
-        var belowBlocks = GetBlocksInDirection(_block, checkDirections[0], checkDirections[0], _block.X, 0);
-        var aboveBlocks = GetBlocksInDirection(_block, checkDirections[1], checkDirections[1], _block.X, grid.YDimension - 1);
+        verticalBlocks.Add(block);
+        var belowBlocks = GetBlocksInDirection(block, checkDirections[0], checkDirections[0], block.X, 0);
+        var aboveBlocks = GetBlocksInDirection(block, checkDirections[1], checkDirections[1], block.X, grid.YDimension - 1);
 
         AddFoundBlocksTo(verticalBlocks, belowBlocks);
         AddFoundBlocksTo(verticalBlocks, aboveBlocks);
@@ -147,26 +208,40 @@ public class BlocksMatcher : MonoBehaviour
         return verticalBlocks;
     }
 
-    private void AddFoundBlocksTo(List<Block> _blockLists, List<Block> _otherBlocks)
+    /// <summary>
+    /// Add a block list to another list. Except the duplicate blocks.
+    /// </summary>
+    /// <param name="blockLists">Original list.</param>
+    /// <param name="otherBlocks">Other list</param>
+    private void AddFoundBlocksTo(List<Block> blockLists, List<Block> otherBlocks)
     {
-        foreach (Block block in _otherBlocks)
+        foreach (Block block in otherBlocks)
         {
-            if (!_blockLists.Contains(block))
+            if (!blockLists.Contains(block))
             {
-                _blockLists.Add(block);
+                blockLists.Add(block);
             }
         }
     }
 
-    private List<Block> GetBlocksInDirection(Block _block, int _xDir, int _yDir, int _endX, int _endY)
+    /// <summary>
+    /// Get blocks of the same type of a chosen block in 1 direction.
+    /// </summary>
+    /// <param name="block">Chosen block.</param>
+    /// <param name="xDir">X direction</param>
+    /// <param name="yDir">Y direction</param>
+    /// <param name="endX">The stopping X position</param>
+    /// <param name="endY">The stopping Y position</param>
+    /// <returns>Lists of found blocks.</returns>
+    private List<Block> GetBlocksInDirection(Block block, int xDir, int yDir, int endX, int endY)
     {
         List<Block> blocks = new List<Block>();
-        for (int i = _block.X; i != _endX + _xDir; i += _xDir)
+        for (int i = block.X; i != endX + xDir; i += xDir)
         {
-            for (int j = _block.Y; j != _endY + _yDir; j += _yDir)
+            for (int j = block.Y; j != endY + yDir; j += yDir)
             {
                 Block foundBlock = grid.Blocks[i, j];
-                if (foundBlock.Sprite.Type == _block.Sprite.Type && !blocks.Contains(foundBlock))
+                if (foundBlock.Sprite.Type == block.Sprite.Type && !blocks.Contains(foundBlock))
                 {
                     blocks.Add(foundBlock);
                 }
@@ -177,14 +252,23 @@ public class BlocksMatcher : MonoBehaviour
         return blocks;
     }
 
-    public bool IsAdjacent(Block _blockA, Block _blockB)
+    ///<summary>
+    /// Check if 2 blocks are next to each other in 4 directions: Up, Left, Down, Right
+    ///</summary>
+    ///<returns>True if adjacent.</returns>
+    ///<param name="blockA">Block A</params>
+    ///<param name="blockB">Block B</params>
+    public bool IsAdjacent(Block blockA, Block blockB)
     {
-        if ((Mathf.Abs(_blockA.X - _blockB.X) == 1 && _blockA.Y == _blockB.Y)
-        || (Mathf.Abs(_blockA.Y - _blockB.Y) == 1) && _blockA.X == _blockB.X)
+        if ((Mathf.Abs(blockA.X - blockB.X) == 1 && blockA.Y == blockB.Y)
+        || (Mathf.Abs(blockA.Y - blockB.Y) == 1) && blockA.X == blockB.X)
             return true;
         return false;
     }
 
+    /// <summary>
+    /// Stop all coroutine and clear the block lists.
+    /// </summary>
     public void Reset()
     {
         StopAllCoroutines();

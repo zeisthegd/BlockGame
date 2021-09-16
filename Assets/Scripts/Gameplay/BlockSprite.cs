@@ -4,42 +4,57 @@ using UnityEngine;
 
 public class BlockSprite : MonoBehaviour
 {
-    [SerializeField] TypeSprites[] typeSprites;
-    Dictionary<BlockType, Sprite> blockTypes = new Dictionary<BlockType, Sprite>();
-    BlockType type;
+    [SerializeField] TypeSprite[] typeSprites; //This field is to easily set up types and their sprite by drag and drop in the editor.
+    Dictionary<BlockType, Sprite> blockTypes = new Dictionary<BlockType, Sprite>(); // Dictionary of key block type and sprite value;
+    BlockType type; // Current type of block
+
     void Awake()
     {
         InitializeBlockTypeDictionary();
     }
 
+    /// <summary>
+    /// Using dictionary to store the type and sprite of block to easily check or change type.
+    /// </summary>
     void InitializeBlockTypeDictionary()
     {
-        foreach (TypeSprites _type in typeSprites)
+        foreach (TypeSprite type in typeSprites)
         {
-            blockTypes.Add(_type.type, _type.sprite);
+            blockTypes.Add(type.type, type.sprite);
         }
     }
 
-    public void SetType(BlockType _type)
+    /// <summary>
+    /// Change type of block and change its sprite too.
+    /// </summary>
+    /// <param name="type">Type of block.</param>
+    public void SetType(BlockType type)
     {
-        type = _type;
+        this.type = type;
         SpriteRenderer sprite = GetComponentInChildren<SpriteRenderer>();
         if (blockTypes.ContainsKey(type))
             sprite.sprite = blockTypes[type];
     }
 
+
+    /// <summary>
+    /// Struct hold the Block Type and its sprite.
+    /// </summary>    
     [System.Serializable]
-    struct TypeSprites
+    struct TypeSprite
     {
         public BlockType type;
         public Sprite sprite;
     }
 
-    public BlockType Type { get => type; set { SetType(value); } }
     public int TypeCount { get => blockTypes.Count; }
+    public BlockType Type { get => type; set { SetType(value); } }
     public Dictionary<BlockType, Sprite> BlockTypes { get => blockTypes; set => blockTypes = value; }
 }
 
+/// <summary>
+/// The types of blocks. Each block must have 1 any only 1 type.
+/// </summary>
 public enum BlockType
 {
     MELON,

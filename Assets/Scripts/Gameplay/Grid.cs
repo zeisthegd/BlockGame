@@ -7,41 +7,52 @@ using UnityEngine.Events;
 public class Grid : MonoBehaviour
 {
     [Header("--- Grid Settings ---")]
-    [SerializeField] int xDimension = 1;
-    [SerializeField] int yDimension = 1;
-    [SerializeField] float fillTime = 1;
+    [SerializeField] int xDimension = 8;// X size of the board
+    [SerializeField] int yDimension = 8;// Y size of the board
+    [SerializeField] float fillTime = 1;// Time used to refill the board when matches are cleared.
 
     [Header("--- Prefabs ---")]
-    [SerializeField] BlockPrefab[] blockPrefabs;
+    [SerializeField] BlockPrefab[] blockPrefabs; // The prefabs
 
+    [Header("--- Components ---")]
+    [SerializeField] BlocksMatcher blocksMatcher;
+    [SerializeField] PointCalculator pointCalculator;
 
-    Block[,] blocks;
-    BlocksMatcher blocksMatcher;
-    PointCalculator pointCalculator;
-
-    public event UnityAction NotEnoughBlocksToPlay;
+    Block[,] blocks; //The array that store blocks data.
+    public event UnityAction NotEnoughBlocksToPlay; //Called when there is not enough blocks to play with.
 
     void Awake()
     {
         blocksMatcher = GetComponent<BlocksMatcher>();
         pointCalculator = GetComponent<PointCalculator>();
     }
+
     void Start()
     {
         StartNewGame();
     }
 
+    /// <summary>
+    /// Reset everything and start a new game.
+    /// </summary>
     public void StartNewGame()
     {
-        pointCalculator.Reset();
         MakeNewBoard();
+        GameManager.Instance.ResetGame();
     }
+
+    /// <summary>
+    /// Clear the board and instantiate new blocks.
+    /// </summary>
     public void MakeNewBoard()
     {
         ClearBoard();
         InstantiateBlocks();
     }
 
+    /// <summary>
+    /// Instantiate new blocks at the beginning of the game.
+    /// </summary>
     void InstantiateBlocks()
     {
         blocks = new Block[xDimension, yDimension];
@@ -50,11 +61,15 @@ public class Grid : MonoBehaviour
         {
             for (int j = 0; j < yDimension; j++)
             {
-                SpawnNewBlock(i, j, BlockMode.NORMAL, randStartPos);
+                SpawnNewBlock(i, j, BlockState.NORMAL, randStartPos);
             }
         }
     }
 
+    /// <summary>
+    /// After refilling the block, there will be a chance that the blocks will make more matches.
+    /// <br/> So I check the board again to clear the valid matches after the filling animations has ended.
+    /// </summary>
     public IEnumerator Fill()
     {
         bool needRefill = true;
@@ -68,14 +83,26 @@ public class Grid : MonoBehaviour
             needRefill = blocksMatcher.ClearAllValidMatches();
             Block.canPress = !needRefill;
             CheckCountRemainingBlocks();
+            if (needRefill == false)
+                GameManager.Instance.CheckRemainingMoves();
         }
     }
+
+    /// <summary>
+    /// Fill the board with blocks.
+    /// </summary>
+    /// <returns>Is filling the board or not?</returns>
     public bool FillBoard()
     {
         bool filledInbetween = FillBetweenTopAndBottomRow();
         bool filledTop = FillTopRow();
         return filledInbetween || filledTop;
     }
+
+    /// <summary>
+    /// If the block at the top of the board is an EMPTY block, add a new block of a random type.
+    /// </summary>
+    /// <returns>Is filling top row or not?</returns>
     private bool FillTopRow()
     {
         bool filled = false;
@@ -83,16 +110,20 @@ public class Grid : MonoBehaviour
         for (int i = 0; i < xDimension; i++)
         {
             Block topBlock = blocks[i, topRow];
-            if (topBlock.Mode == BlockMode.EMPTY)
+            if (topBlock.State == BlockState.EMPTY)
             {
                 Destroy(topBlock.gameObject);
-                SpawnNewBlock(i, topRow, BlockMode.NORMAL, new Vector2(i, topRow + 2));
+                SpawnNewBlock(i, topRow, BlockState.NORMAL, new Vector2(i, topRow + 2));
                 filled = true;
             }
         }
         return filled;
     }
 
+    /// <summary>
+    /// Move a block down if the block below it is an EMPTY block.
+    /// </summary>
+    /// <returns>Is filling between top and bottom row or not?</returns>
     private bool FillBetweenTopAndBottomRow()
     {
         bool filled = false;
@@ -104,12 +135,12 @@ public class Grid : MonoBehaviour
                 if (block.Moveable())
                 {
                     Block blockBelow = blocks[i, j - 1];
-                    if (block.Mode != BlockMode.EMPTY && blockBelow.Mode == BlockMode.EMPTY)
+                    if (block.State != BlockState.EMPTY && blockBelow.State == BlockState.EMPTY)
                     {
                         Destroy(blockBelow.gameObject);
                         block.MoveableComponent.Move(i, j - 1);
                         blocks[i, j - 1] = block;
-                        SpawnNewBlock(i, j, BlockMode.EMPTY);
+                        SpawnNewBlock(i, j, BlockState.EMPTY);
                         filled = true;
                     }
                 }
@@ -118,18 +149,35 @@ public class Grid : MonoBehaviour
         return filled;
     }
 
-    public Block SpawnNewBlock(int x, int y, BlockMode mode)
+    /// <summary>
+    /// Instantiate a new block at x and y position.
+    /// </summary>
+    /// <param name="x">X Position</param>
+    /// <param name="y">Y Position</param>
+    /// <param name="state">State</param>
+    /// <returns></returns>
+    public Block SpawnNewBlock(int x, int y, BlockState state)
     {
-        return SpawnNewBlock(x, y, mode, new Vector2(x, y));
+        return SpawnNewBlock(x, y, state, new Vector2(x, y));
     }
 
-    public Block SpawnNewBlock(int x, int y, BlockMode mode, Vector2 position)
+    /// <summary>
+    /// Add a new block to the blocks array.
+    /// <br/> Set up the block position, type, state.
+    /// <br/> Instantiate a new block at a specific position.
+    /// </summary>
+    /// <param name="x">X Position</param>
+    /// <param name="y">Y Position</param>
+    /// <param name="state">State</param>
+    /// <param name="position">Position in 2D space</param>
+    /// <returns></returns>
+    public Block SpawnNewBlock(int x, int y, BlockState state, Vector2 position)
     {
-        GameObject newBlock = Instantiate(blockPrefabs[(int)mode].prefab, position, Quaternion.identity);
+        GameObject newBlock = Instantiate(blockPrefabs[(int)state].prefab, position, Quaternion.identity);
         Block blockscript = newBlock.GetComponent<Block>();
-        blockscript.Init(x, y, this, mode);
+        blockscript.Init(x, y, this, state);
 
-        if (mode == BlockMode.NORMAL)
+        if (state == BlockState.NORMAL)
         {
             blockscript.Sprite.SetType((BlockType)Random.Range(0, blockscript.Sprite.TypeCount));
             blockscript.MoveableComponent.Move(blockscript.X, blockscript.Y);
@@ -147,10 +195,13 @@ public class Grid : MonoBehaviour
         return blockscript;
     }
 
+
+    /// <summary>
+    /// Delete all the blocks gameObject on the board.
+    /// </summary>
     private void ClearBoard()
     {
         StopAllCoroutines();
-        blocksMatcher.Reset();
         var blocks = FindObjectsOfType<Block>();
         foreach (Block block in blocks)
         {
@@ -158,6 +209,10 @@ public class Grid : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Check the total count of remaining blocks
+    /// I made these function because the test description requires me. 
+    /// </summary>
     public void CheckCountRemainingBlocks()
     {
         int totalRemaining = CountRemainingBlocks();
@@ -166,6 +221,10 @@ public class Grid : MonoBehaviour
             NotEnoughBlocksToPlay?.Invoke();
     }
 
+    /// <summary>
+    /// Count total remaining blocks
+    /// </summary>
+    /// <returns>Total remaining blocks</returns>
     public int CountRemainingBlocks()
     {
         int total = 0;
@@ -179,6 +238,10 @@ public class Grid : MonoBehaviour
         return total;
     }
 
+    /// <summary>
+    /// If no type of block has more than 2 blocks, there is not enough blocks to play with.
+    /// </summary>
+    /// <returns>Have enough block to play with?</returns>
     public bool RemainingBlocksHasEnoughTypeToMatch()
     {
         foreach (BlockType type in blocks[0, 0].Sprite.BlockTypes.Keys)
@@ -195,16 +258,20 @@ public class Grid : MonoBehaviour
         Debug.Log("No type has enough blocks to get matched!");
         return false;
     }
-    public Block[,] Blocks { get => blocks; }
-    public BlocksMatcher BlocksMatcher { get => blocksMatcher; }
+
     public int XDimension { get => xDimension; }
     public int YDimension { get => yDimension; }
+    public Block[,] Blocks { get => blocks; }
+    public BlocksMatcher BlocksMatcher { get => blocksMatcher; }
     public PointCalculator PointCalculator { get => pointCalculator; }
 
+    /// <summary>
+    /// Determine what prefabs that a state will use
+    /// </summary>
     [System.Serializable]
     public struct BlockPrefab
     {
-        public BlockMode mode;
+        public BlockState state;
         public GameObject prefab;
     }
 }
