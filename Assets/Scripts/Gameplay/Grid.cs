@@ -124,6 +124,8 @@ public class Grid : MonoBehaviour
             if (block.Sprite.Type == adjBlock.Sprite.Type)
             {
                 block.SetRandomBlockType();
+                MakeBlockHasNoAdjacentMatches(block);
+                return block;
             }
         }
         return block;

@@ -13,9 +13,9 @@ MonoBehaviour:
   m_Name: GameSettings
   m_EditorClassIdentifier: 
   Moves: 10
-  OneStarScore: 1000
-  TwoStarScore: 2000
-  ThreeStarScore: 4000
+  OneStarScore: 500
+  TwoStarScore: 1250
+  ThreeStarScore: 2000
   Match3Point: 180
   BonusAfter3Spree: 30
   TotalMatchesBonus: 30
