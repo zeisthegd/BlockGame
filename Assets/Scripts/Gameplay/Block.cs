@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Block : MonoBehaviour
 {
-    public static bool canPress = true; // Can the block be pressed or not? When refilling the board, stop the player from pressing the blocks.
+    public static bool CanPress = true; // Can the block be pressed or not? When refilling the board, stop the player from pressing the blocks.
     private int x; // X position of the block in the blocks array.
     private int y; // Y position of the block in the blocks array.
     private Grid grid; // Grid that holds blocks' position data.
@@ -42,12 +42,57 @@ public class Block : MonoBehaviour
         this.state = state;
     }
 
+    /// <summary>
+    /// Change block type.
+    /// </summary>
+    /// <param name="block"></param>
+    public void SetRandomBlockType()
+    {
+        this.Sprite.SetType((BlockType)Random.Range(0, this.Sprite.TypeCount));
+    }
+
+    /// <summary>
+    /// Check if the other block is adjacent to this block.
+    /// </summary>
+    /// <param name="blockB">Other Block</param>
+    /// <returns>The other blocks is adjacent or not?</returns>
+    public bool IsAdjacent(Block blockB)
+    {
+        if ((Mathf.Abs(this.X - blockB.X) == 1 && this.Y == blockB.Y)
+        || (Mathf.Abs(this.Y - blockB.Y) == 1) && this.X == blockB.X)
+            return true;
+        return false;
+    }
+
+    /// <summary>
+    /// Get the 4 blocks in 4 directions: Up, Down, Left, Right
+    /// </summary>
+    /// <returns>Adjacent Blocks</returns>
+    public List<Block> GetAdjacentBlocks()
+    {
+        List<Block> adjBlocks = new List<Block>();
+
+        if (X > 0 && grid.Blocks[X - 1, Y] != null)
+            adjBlocks.Add(grid.Blocks[X - 1, Y]);
+
+        if (X < grid.XDimension - 1 && grid.Blocks[X + 1, Y] != null)
+            adjBlocks.Add(grid.Blocks[X + 1, Y]);
+
+        if (y > 0 && grid.Blocks[X, Y - 1] != null)
+            adjBlocks.Add(grid.Blocks[X, Y - 1]);
+
+        if (Y < grid.YDimension - 1 && grid.Blocks[X, Y + 1] != null)
+            adjBlocks.Add(grid.Blocks[X, Y + 1]);
+
+        return adjBlocks;
+    }
+
     ///<summary>
     /// Called when the block is clicked.
     ///</summary>
     void OnMouseDown()
     {
-        if (canPress)
+        if (CanPress)
             grid.BlocksMatcher.PressedBlock(this);
     }
 

@@ -45,7 +45,7 @@ public class BlocksMatcher : MonoBehaviour
         if (!blocksToSwap.Contains(block))
         {
             if (blocksToSwap.Count == 1)
-                if (!IsAdjacent(blocksToSwap[0], block))
+                if (!blocksToSwap[0].IsAdjacent(block))
                 {
                     Debug.Log("These 2 Blocks are not adjacent!");
                     return;
@@ -54,7 +54,7 @@ public class BlocksMatcher : MonoBehaviour
         }
         else
             Releaseblock(block);
-        if (blocksToSwap.Count == 2)
+        if (blocksToSwap.Count >= 2)
         {
             SwapBlocks(blocksToSwap[0], blocksToSwap[1]);
             ClearAllValidMatches();
@@ -90,7 +90,7 @@ public class BlocksMatcher : MonoBehaviour
     public void SwapBlocks(Block blockA, Block blockB)
     {
         BeginSwappingBlocks?.Invoke();
-        if (IsAdjacent(blockA, blockB))
+        if (blockA.IsAdjacent(blockB))
         {
             bool bothAandBNotEmpty = blockA.Sprite.Type != BlockType.NONE && blockB.Sprite.Type != BlockType.NONE;
             SwapPositions(blockA, blockB);
@@ -258,13 +258,7 @@ public class BlocksMatcher : MonoBehaviour
     ///<returns>True if adjacent.</returns>
     ///<param name="blockA">Block A</params>
     ///<param name="blockB">Block B</params>
-    public bool IsAdjacent(Block blockA, Block blockB)
-    {
-        if ((Mathf.Abs(blockA.X - blockB.X) == 1 && blockA.Y == blockB.Y)
-        || (Mathf.Abs(blockA.Y - blockB.Y) == 1) && blockA.X == blockB.X)
-            return true;
-        return false;
-    }
+
 
     /// <summary>
     /// Stop all coroutine and clear the block lists.

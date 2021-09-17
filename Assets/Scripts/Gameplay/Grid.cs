@@ -48,6 +48,7 @@ public class Grid : MonoBehaviour
     {
         ClearBoard();
         InstantiateBlocks();
+        StartCoroutine(Fill());
     }
 
     /// <summary>
@@ -61,11 +62,76 @@ public class Grid : MonoBehaviour
         {
             for (int j = 0; j < yDimension; j++)
             {
-                SpawnNewBlock(i, j, BlockState.NORMAL, randStartPos);
+                Block newBlock = SpawnNewBlock(i, j, BlockState.NORMAL, randStartPos);
+                newBlock = MakeBlockHasNoAdjacentMatches(newBlock);
             }
         }
     }
 
+    #region Blocks Handling
+    /// <summary>
+    /// Instantiate a new block at x and y position.
+    /// </summary>
+    /// <param name="x">X Position</param>
+    /// <param name="y">Y Position</param>
+    /// <param name="state">State</param>
+    /// <returns></returns>
+    public Block SpawnNewBlock(int x, int y, BlockState state)
+    {
+        return SpawnNewBlock(x, y, state, new Vector2(x, y));
+    }
+
+    /// <summary>
+    /// Add a new block to the blocks array.
+    /// <br/> Set up the block position, type, state.
+    /// <br/> Instantiate a new block at a specific position.
+    /// </summary>
+    /// <param name="x">X Position</param>
+    /// <param name="y">Y Position</param>
+    /// <param name="state">State</param>
+    /// <param name="position">Position in 2D space</param>
+    /// <returns></returns>
+    public Block SpawnNewBlock(int x, int y, BlockState state, Vector2 position)
+    {
+        GameObject newBlock = Instantiate(blockPrefabs[(int)state].prefab, position, Quaternion.identity);
+        Block block = newBlock.GetComponent<Block>();
+        block.Init(x, y, this, state);
+
+        if (state == BlockState.NORMAL)
+        {
+            block.SetRandomBlockType();
+            block.MoveableComponent.Move(block.X, block.Y);
+        }
+        else
+        {
+            block.Sprite.SetType(BlockType.NONE);
+            newBlock.name = $"EMPTY [{x},{y}]";
+        }
+
+
+        newBlock.name = block.Sprite.Type.ToString() + $" [{block.X},{block.Y}]";
+        newBlock.transform.parent = this.transform;
+        blocks[x, y] = block;
+
+        return block;
+    }
+
+    private Block MakeBlockHasNoAdjacentMatches(Block block)
+    {
+        var adjBlocks = block.GetAdjacentBlocks();
+        foreach (Block adjBlock in adjBlocks)
+        {
+            if (block.Sprite.Type == adjBlock.Sprite.Type)
+            {
+                block.SetRandomBlockType();
+            }
+        }
+        return block;
+    }
+    #endregion
+
+
+    #region Board Handling
     /// <summary>
     /// After refilling the block, there will be a chance that the blocks will make more matches.
     /// <br/> So I check the board again to clear the valid matches after the filling animations has ended.
@@ -73,19 +139,17 @@ public class Grid : MonoBehaviour
     public IEnumerator Fill()
     {
         bool needRefill = true;
+        Block.CanPress = false;
         while (needRefill)
         {
             yield return new WaitForSeconds(fillTime);
             while (FillBoard())
-            {
                 yield return new WaitForSeconds(fillTime);
-            }
             needRefill = blocksMatcher.ClearAllValidMatches();
-            Block.canPress = !needRefill;
             CheckCountRemainingBlocks();
-            if (needRefill == false)
-                GameManager.Instance.CheckRemainingMoves();
         }
+        Block.CanPress = true;
+        GameManager.Instance.CheckRemainingMoves();
     }
 
     /// <summary>
@@ -149,51 +213,6 @@ public class Grid : MonoBehaviour
         return filled;
     }
 
-    /// <summary>
-    /// Instantiate a new block at x and y position.
-    /// </summary>
-    /// <param name="x">X Position</param>
-    /// <param name="y">Y Position</param>
-    /// <param name="state">State</param>
-    /// <returns></returns>
-    public Block SpawnNewBlock(int x, int y, BlockState state)
-    {
-        return SpawnNewBlock(x, y, state, new Vector2(x, y));
-    }
-
-    /// <summary>
-    /// Add a new block to the blocks array.
-    /// <br/> Set up the block position, type, state.
-    /// <br/> Instantiate a new block at a specific position.
-    /// </summary>
-    /// <param name="x">X Position</param>
-    /// <param name="y">Y Position</param>
-    /// <param name="state">State</param>
-    /// <param name="position">Position in 2D space</param>
-    /// <returns></returns>
-    public Block SpawnNewBlock(int x, int y, BlockState state, Vector2 position)
-    {
-        GameObject newBlock = Instantiate(blockPrefabs[(int)state].prefab, position, Quaternion.identity);
-        Block blockscript = newBlock.GetComponent<Block>();
-        blockscript.Init(x, y, this, state);
-
-        if (state == BlockState.NORMAL)
-        {
-            blockscript.Sprite.SetType((BlockType)Random.Range(0, blockscript.Sprite.TypeCount));
-            blockscript.MoveableComponent.Move(blockscript.X, blockscript.Y);
-            newBlock.name = blockscript.Sprite.Type.ToString() + $" [{x},{y}]";
-        }
-        else
-        {
-            blockscript.Sprite.SetType(BlockType.NONE);
-            newBlock.name = $"EMPTY [{x},{y}]";
-        }
-
-        newBlock.transform.parent = this.transform;
-        blocks[x, y] = blockscript;
-
-        return blockscript;
-    }
 
 
     /// <summary>
@@ -258,6 +277,8 @@ public class Grid : MonoBehaviour
         Debug.Log("No type has enough blocks to get matched!");
         return false;
     }
+
+    #endregion
 
     public int XDimension { get => xDimension; }
     public int YDimension { get => yDimension; }

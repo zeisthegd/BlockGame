@@ -53,7 +53,7 @@ public class MainUI : MonoBehaviour
     public void Pause()
     {
         ShowResult();
-        Block.canPress = false;
+        Block.CanPress = false;
         pauseMenu.SetActive(true);
         Time.timeScale = 0f;
     }
@@ -65,7 +65,7 @@ public class MainUI : MonoBehaviour
     {
         if (GameManager.Instance.CurrentMoves > 0)
         {
-            Block.canPress = true;
+            Block.CanPress = true;
             pauseMenu.SetActive(false);
             Time.timeScale = 1f;
         }
