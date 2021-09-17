@@ -116,6 +116,14 @@ public class Grid : MonoBehaviour
         return block;
     }
 
+    /// <summary>
+    /// Get the adjacent blocks of the chosen block.
+    /// <br/>If one of them is of the same type as the chosen block.
+    /// <br/>Change the chosen block's type and check again.
+    /// <br/>Check until there's no same type adjacent blocks.
+    /// </summary>
+    /// <param name="block"></param>
+    /// <returns>Block after change type.</returns>
     private Block MakeBlockHasNoAdjacentMatches(Block block)
     {
         var adjBlocks = block.GetAdjacentBlocks();
