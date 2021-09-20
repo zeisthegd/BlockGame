@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 /// <summary>
 /// Manage most of the Audio of the game
@@ -10,6 +11,9 @@ public class AudioPlayer : MonoBehaviour
     [Header("--- Audio Source ---")]
     [SerializeField] AudioSource bgmSource; // Background music source
     [SerializeField] AudioSource sfxSource; // Sound effects source
+    [Header("--- Audio Slider ---")]
+    [SerializeField] Slider bgmSlider; // Background music source
+    [SerializeField] Slider sfxSlider; // Sound effects source
 
     [Header("--- BGM Clips ---")]
     [SerializeField] AudioClip[] bgmClips;// Background music clips
@@ -26,6 +30,8 @@ public class AudioPlayer : MonoBehaviour
     void Awake()
     {
         grid = FindObjectOfType<Grid>();
+        bgmSlider.onValueChanged.AddListener(delegate { ChangeBGMVolume(); });
+        sfxSlider.onValueChanged.AddListener(delegate { ChangeSFXVolume(); });
     }
 
     /// <summary>
@@ -98,5 +104,30 @@ public class AudioPlayer : MonoBehaviour
     void PlaySFX(AudioClip clip)
     {
         sfxSource.PlayOneShot(clip);
+    }
+    /// <summary>
+    /// Change SFX volume
+    /// </summary>
+    public void ChangeSFXVolume()
+    {
+        ChangeVolume(sfxSource, sfxSlider);
+    }
+
+    /// <summary>
+    /// Change BGM volume
+    /// </summary>
+    public void ChangeBGMVolume()
+    {
+        ChangeVolume(bgmSource, bgmSlider);
+    }
+
+    /// <summary>
+    /// Change volume of an audio source based on a slider's value
+    /// </summary>
+    /// <param name="source">Audio Source</param>
+    /// <param name="slider">Slider</param>
+    private void ChangeVolume(AudioSource source, Slider slider)
+    {
+        source.volume = slider.value;
     }
 }

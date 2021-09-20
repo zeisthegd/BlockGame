@@ -58,7 +58,7 @@ public class BlocksMatcher : MonoBehaviour
         {
             SwapBlocks(blocksToSwap[0], blocksToSwap[1]);
             ClearAllValidMatches();
-            StartCoroutine(grid.Fill());
+            grid.StartFillingBoard();
         }
     }
 
@@ -252,12 +252,37 @@ public class BlocksMatcher : MonoBehaviour
         return blocks;
     }
 
-    ///<summary>
-    /// Check if 2 blocks are next to each other in 4 directions: Up, Left, Down, Right
-    ///</summary>
-    ///<returns>True if adjacent.</returns>
-    ///<param name="blockA">Block A</params>
-    ///<param name="blockB">Block B</params>
+    /// <summary>
+    /// Search through every block of the grid, try to swap them with their adjacent blocks.
+    /// If by swapping they make new match, swap them back and return true.
+    /// </summary>
+    /// <returns>Does the board have any match to make?</returns>
+    public bool HasMatchesToMake()
+    {
+        foreach (Block block in grid.Blocks)
+        {
+            var adjBlocks = block.GetAdjacentBlocks();
+            foreach (Block adjBlock in adjBlocks)
+            {
+                var ogType = adjBlock.Sprite.Type;
+                adjBlock.Sprite.Type = block.Sprite.Type;
+                block.Sprite.Type = ogType;
+
+                if (GetMatch(adjBlock).Count >= 3)
+                {
+                    block.Sprite.Type = adjBlock.Sprite.Type;
+                    adjBlock.Sprite.Type = ogType;
+                    return true;
+                }
+
+                block.Sprite.Type = adjBlock.Sprite.Type;
+                adjBlock.Sprite.Type = ogType;
+            }
+        }
+        Debug.Log("Don't have enough blocks to match");
+        return false;
+    }
+
 
 
     /// <summary>

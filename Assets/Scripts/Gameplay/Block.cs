@@ -49,6 +49,7 @@ public class Block : MonoBehaviour
     public void SetRandomBlockType()
     {
         this.Sprite.SetType((BlockType)Random.Range(0, this.Sprite.TypeCount));
+        this.gameObject.name = Name;
     }
 
     /// <summary>

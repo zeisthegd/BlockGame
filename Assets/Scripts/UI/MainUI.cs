@@ -63,7 +63,7 @@ public class MainUI : MonoBehaviour
     /// </summary>
     public void Resume()
     {
-        if (GameManager.Instance.CurrentMoves > 0)
+        if (!GameManager.Instance.IsGameOver)
         {
             Block.CanPress = true;
             pauseMenu.SetActive(false);
@@ -71,7 +71,7 @@ public class MainUI : MonoBehaviour
         }
         else
         {
-            Debug.Log("GAME OVER: Out of moves");
+            Debug.Log("GAME OVER");
         }
     }
 

@@ -48,7 +48,7 @@ public class Grid : MonoBehaviour
     {
         ClearBoard();
         InstantiateBlocks();
-        StartCoroutine(Fill());
+        StartFillingBoard();
     }
 
     /// <summary>
@@ -108,8 +108,6 @@ public class Grid : MonoBehaviour
             newBlock.name = $"EMPTY [{x},{y}]";
         }
 
-
-        newBlock.name = block.Sprite.Type.ToString() + $" [{block.X},{block.Y}]";
         newBlock.transform.parent = this.transform;
         blocks[x, y] = block;
 
@@ -142,6 +140,13 @@ public class Grid : MonoBehaviour
 
 
     #region Board Handling
+
+    public void StartFillingBoard()
+    {
+        StartCoroutine(Fill());
+        if (blocksMatcher.HasMatchesToMake() == false)
+            MakeNewBoard();
+    }
     /// <summary>
     /// After refilling the block, there will be a chance that the blocks will make more matches.
     /// <br/> So I check the board again to clear the valid matches after the filling animations has ended.
@@ -160,6 +165,7 @@ public class Grid : MonoBehaviour
         }
         Block.CanPress = true;
         GameManager.Instance.CheckRemainingMoves();
+        
     }
 
     /// <summary>
@@ -223,8 +229,6 @@ public class Grid : MonoBehaviour
         return filled;
     }
 
-
-
     /// <summary>
     /// Delete all the blocks gameObject on the board.
     /// </summary>
@@ -237,6 +241,8 @@ public class Grid : MonoBehaviour
             Destroy(block.gameObject);
         }
     }
+
+
 
     /// <summary>
     /// Check the total count of remaining blocks

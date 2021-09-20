@@ -10,6 +10,7 @@ public class GameManager : MonoBehaviour
 
     int currentMoves;// Total moves left.
     int currentPoints; // Total points the player has scored.
+    bool isGameOver = false;
 
     public event UnityAction GameOver;// Called when there is no move left.
     public event UnityAction RestartGame;// Invoke when the game is restarted.
@@ -50,7 +51,7 @@ public class GameManager : MonoBehaviour
     {
         if (currentMoves <= 0)
         {
-            GameOver?.Invoke();
+            InvokeGameOver();
         }
     }
 
@@ -61,7 +62,14 @@ public class GameManager : MonoBehaviour
     {
         currentPoints = 0;
         currentMoves = settings.Moves;
+        isGameOver = false;
         RestartGame?.Invoke();
+    }
+
+    public void InvokeGameOver()
+    {
+        isGameOver = true;
+        GameOver?.Invoke();
     }
 
     /// <summary>
@@ -83,4 +91,5 @@ public class GameManager : MonoBehaviour
     public int CurrentPoints { get => currentPoints; set => currentPoints = value; }
     public int CurrentMoves { get => currentMoves; private set => currentMoves = value; }
     public GameSettings Settings { get => settings; private set => settings = value; }
+    public bool IsGameOver { get => isGameOver; private set => isGameOver = value; }
 }
