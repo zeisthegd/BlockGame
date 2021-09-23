@@ -95,6 +95,7 @@ public class PointCalculator : MonoBehaviour
     /// Bonus points will be added when:
     /// a) The player matched more than 3 blocks;
     /// b) The player matched more than 1 cluster of blocks.
+    /// c) The match that has a special type block will yield bonus points.
     ///</summary>
     ///<returns>Total points to add.</returns>
     ///<param name ="blocks">Matched blocks</param>

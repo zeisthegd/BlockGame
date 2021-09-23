@@ -155,17 +155,22 @@ public class BlocksMatcher : MonoBehaviour
         }
         if (matchedBlocks.Count >= 3)
             BeginClearingBlocks?.Invoke();
+
+        /// Clear all matches.
         foreach (Block block in matchedBlocks)
         {
             if (!specialBlocks.Contains(block))
                 block.ClearableComponent.Clear();
         }
+        /// Change the blocks in specialblocks to the special type.
         foreach (Block block in specialBlocks)
         {
             block.Sprite.SetType(BlockType.STAR);
         }
+
         matchedBlocks.Clear();
         specialBlocks.Clear();
+        
         return cleared;
     }
 
@@ -244,6 +249,10 @@ public class BlocksMatcher : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Add the block to special blocks list.
+    /// </summary>
+    /// <param name="block">Block</param>
     private void AddBlockToSpecial(Block block)
     {
         if (!specialBlocks.Contains(block))
