@@ -105,9 +105,9 @@ public class BlocksMatcher : MonoBehaviour
                 AddFoundBlocksTo(matchedBlocks, blocksFromB);
 
                 if (blocksFromA.Count >= 4)
-                    ChangeBlockToSpecial(blockA);
+                    AddBlockToSpecial(blockA);
                 if (blocksFromB.Count >= 4)
-                    ChangeBlockToSpecial(blockB);
+                    AddBlockToSpecial(blockB);
             }
             else
                 SwapPositions(blockB, blockA);
@@ -147,6 +147,8 @@ public class BlocksMatcher : MonoBehaviour
                     {
                         AddFoundBlocksTo(matchedBlocks, matches);
                         cleared = true;
+                        if (matches.Count >= 4)
+                            AddBlockToSpecial(matches[matches.Count / 2]);
                     }
                 }
             }
@@ -242,7 +244,7 @@ public class BlocksMatcher : MonoBehaviour
         }
     }
 
-    private void ChangeBlockToSpecial(Block block)
+    private void AddBlockToSpecial(Block block)
     {
         if (!specialBlocks.Contains(block))
             specialBlocks.Add(block);

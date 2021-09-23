@@ -139,7 +139,6 @@ public class PointCalculator : MonoBehaviour
         int points = settings.Match3Point + (settings.BonusAfter3Spree * (currentChain - 3)) + ((totalMatches - 1) * settings.TotalMatchesBonus);
         if (hasSpecialBlock)
         {
-            Debug.Log(hasSpecialBlock);
             points += settings.SpecialBlockBonus;
             hasSpecialBlock = false;
         }
