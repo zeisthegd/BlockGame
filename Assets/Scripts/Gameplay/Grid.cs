@@ -144,8 +144,6 @@ public class Grid : MonoBehaviour
     public void StartFillingBoard()
     {
         StartCoroutine(Fill());
-        if (blocksMatcher.HasMatchesToMake() == false)
-            MakeNewBoard();
     }
     /// <summary>
     /// After refilling the block, there will be a chance that the blocks will make more matches.
@@ -165,7 +163,8 @@ public class Grid : MonoBehaviour
         }
         Block.CanPress = true;
         GameManager.Instance.CheckRemainingMoves();
-        
+        if (blocksMatcher.HasMatchesToMake() == false)
+            MakeNewBoard();
     }
 
     /// <summary>

@@ -64,5 +64,6 @@ public enum BlockType
     PUMPKIN,
     AVOCADO,
     MUSHROOM,
+    STAR,
     NONE
 }

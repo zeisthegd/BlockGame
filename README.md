@@ -18,6 +18,7 @@
 # Credits
 * Background: pixel-sky-backgrounds-byCaniaEast at caniaeast.itch.io
 * UIPack: I forgot to note
+* UI Icons: gamedeveloperstudio.itch.io
 * Food Sprites: FOOD Free from https://www.artstation.com/sev_4
 * Background Music: Casual Game BGM #5 from https://assetstore.unity.com/publishers/9381
 * Sound effects: Dustyroom Casual Game Sound - One Shot SFX Pack at dustyroom.com

@@ -10,6 +10,7 @@ public class BlocksMatcher : MonoBehaviour
 {
     Grid grid;// Grid that store blocks data.
     List<Block> matchedBlocks = new List<Block>();// Hold the matches that the functions have found.
+    List<Block> specialBlocks = new List<Block>();// Hold the matches that the functions have found.
     List<Block> blocksToSwap = new List<Block>();// Holds the 2 blocks that is going to be swapped.
 
     // Add 1 of these value to X or Y position of the block to search.
@@ -94,11 +95,22 @@ public class BlocksMatcher : MonoBehaviour
         {
             bool bothAandBNotEmpty = blockA.Sprite.Type != BlockType.NONE && blockB.Sprite.Type != BlockType.NONE;
             SwapPositions(blockA, blockB);
-            if (GetMatch(blockA).Count < 3 && GetMatch(blockB).Count < 3 && bothAandBNotEmpty)
+
+            var blocksFromA = GetMatch(blockA);
+            var blocksFromB = GetMatch(blockB);
+
+            if (blocksFromA.Count >= 3 || blocksFromB.Count >= 3 && bothAandBNotEmpty)
             {
-                //Swap back if new positions not making any matches.
-                SwapPositions(blockB, blockA);
+                AddFoundBlocksTo(matchedBlocks, blocksFromA);
+                AddFoundBlocksTo(matchedBlocks, blocksFromB);
+
+                if (blocksFromA.Count >= 4)
+                    ChangeBlockToSpecial(blockA);
+                if (blocksFromB.Count >= 4)
+                    ChangeBlockToSpecial(blockB);
             }
+            else
+                SwapPositions(blockB, blockA);
         }
         blocksToSwap.Clear();
     }
@@ -124,12 +136,11 @@ public class BlocksMatcher : MonoBehaviour
     public bool ClearAllValidMatches()
     {
         bool cleared = false;
-        matchedBlocks.Clear();
         for (int i = 0; i < grid.XDimension; i++)
         {
             for (int j = 0; j < grid.YDimension; j++)
             {
-                if (grid.Blocks[i, j].ClearableComponent != null)
+                if (grid.Blocks[i, j].ClearableComponent != null && !matchedBlocks.Contains(grid.Blocks[i, j]))
                 {
                     List<Block> matches = GetMatch(grid.Blocks[i, j]);
                     if (matches.Count >= 3)
@@ -140,12 +151,19 @@ public class BlocksMatcher : MonoBehaviour
                 }
             }
         }
-        if (cleared)
+        if (matchedBlocks.Count >= 3)
             BeginClearingBlocks?.Invoke();
         foreach (Block block in matchedBlocks)
         {
-            block.ClearableComponent.Clear();
+            if (!specialBlocks.Contains(block))
+                block.ClearableComponent.Clear();
         }
+        foreach (Block block in specialBlocks)
+        {
+            block.Sprite.SetType(BlockType.STAR);
+        }
+        matchedBlocks.Clear();
+        specialBlocks.Clear();
         return cleared;
     }
 
@@ -224,6 +242,13 @@ public class BlocksMatcher : MonoBehaviour
         }
     }
 
+    private void ChangeBlockToSpecial(Block block)
+    {
+        if (!specialBlocks.Contains(block))
+            specialBlocks.Add(block);
+    }
+
+
     /// <summary>
     /// Get blocks of the same type of a chosen block in 1 direction.
     /// </summary>
@@ -241,7 +266,8 @@ public class BlocksMatcher : MonoBehaviour
             for (int j = block.Y; j != endY + yDir; j += yDir)
             {
                 Block foundBlock = grid.Blocks[i, j];
-                if (foundBlock.Sprite.Type == block.Sprite.Type && !blocks.Contains(foundBlock))
+                if ((foundBlock.Sprite.Type == BlockType.STAR || foundBlock.Sprite.Type == block.Sprite.Type)
+                    && !blocks.Contains(foundBlock))
                 {
                     blocks.Add(foundBlock);
                 }
@@ -293,6 +319,7 @@ public class BlocksMatcher : MonoBehaviour
         StopAllCoroutines();
         matchedBlocks.Clear();
         blocksToSwap.Clear();
+        specialBlocks.Clear();
     }
     public List<Block> MatchedBlocks { get => matchedBlocks; }
 
