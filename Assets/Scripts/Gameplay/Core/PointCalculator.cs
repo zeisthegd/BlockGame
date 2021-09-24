@@ -101,7 +101,7 @@ public class PointCalculator : MonoBehaviour
     ///<param name ="blocks">Matched blocks</param>
     int CalculatePoints(List<Block> blocks)
     {
-        BlockType lastType = blocks[0].Sprite.Type != BlockType.STAR ? blocks[0].Sprite.Type : blocks[1].Sprite.Type;
+        BlockType lastType = blocks[0].Data.Type != BlockType.STAR ? blocks[0].Data.Type : blocks[1].Data.Type;
         int previousX = blocks[0].X, previousY = blocks[0].Y;
 
         int totalPoints = 0;
@@ -113,18 +113,17 @@ public class PointCalculator : MonoBehaviour
         foreach (Block block in blocks)
         {
             hasSpecialBlock = block.IsSpecial == true ? true : hasSpecialBlock;
-            if ((block.Sprite.Type != lastType && block.Sprite.Type != BlockType.STAR) || blocks.IndexOf(block) == blocks.Count - 1)
+            if ((block.Data.Type != lastType && block.Data.Type != BlockType.STAR) || blocks.IndexOf(block) == blocks.Count - 1)
             {
-                totalMatches++;
-                totalPoints += Calculate(ref currentChain, totalMatches, hasSpecialBlock);
+                totalPoints += Calculate(ref currentChain, hasSpecialBlock);
             }
             currentChain += 1;
 
             previousX = block.X;
             previousY = block.Y;
 
-            if (block.Sprite.Type != BlockType.STAR)
-                lastType = block.Sprite.Type;
+            if (block.Data.Type != BlockType.STAR)
+                lastType = block.Data.Type;
         }
         return totalPoints;
     }
@@ -135,9 +134,9 @@ public class PointCalculator : MonoBehaviour
     /// <param name="currentChain">Total blocks of the current match </param>
     /// <param name="totalMatches">Total matches that will be cleared </param>
     /// <returns></returns>
-    private int Calculate(ref int currentChain, int totalMatches, bool hasSpecialBlock)
+    private int Calculate(ref int currentChain, bool hasSpecialBlock)
     {
-        int points = settings.Match3Point + (settings.BonusAfter3Spree * (currentChain - 3)) + ((totalMatches - 1) * settings.TotalMatchesBonus);
+        int points = settings.Match3Point + (settings.BonusAfter3Spree * (currentChain - 3));
         if (hasSpecialBlock)
         {
             points += settings.SpecialBlockBonus;

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BlockEffect : MonoBehaviour
+public class BlockVisualFX : MonoBehaviour
 {
     public GameObject clearEffect;
     public GameObject specialEffect;

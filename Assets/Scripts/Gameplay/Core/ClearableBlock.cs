@@ -15,12 +15,12 @@ public class ClearableBlock : MonoBehaviour
     [SerializeField] GameObject clearEffect; //The particle effect played when a block is cleared.
 
     Block block; // The block component
-    BlockEffect blockEffect;
+    BlockVisualFX blockEffect;
 
     void Awake()
     {
         block = GetComponent<Block>();
-        blockEffect = GetComponent<BlockEffect>();
+        blockEffect = GetComponent<BlockVisualFX>();
     }
 
     /// <summary>

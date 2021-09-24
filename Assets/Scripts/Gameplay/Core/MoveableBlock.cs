@@ -36,7 +36,7 @@ public class MoveableBlock : MonoBehaviour
     IEnumerator MoveCoroutine(int newX, int newY)
     {
         block.DeactiveChosenUI();
-        block.gameObject.name = block.Sprite.Type.ToString() + $" [{newX},{newY}]";
+        block.gameObject.name = block.Data.Type.ToString() + $" [{newX},{newY}]";
         block.X = newX;
         block.Y = newY;
 

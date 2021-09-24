@@ -3,11 +3,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BlockSprite : MonoBehaviour
+public class BlockData : MonoBehaviour
 {
     [SerializeField] TypeSprite[] spritesOfType; //This field is to easily set up types and their sprite by drag and drop in the editor.
-    Dictionary<BlockType, Tuple<Sprite, Color>> blockTypes = new Dictionary<BlockType, Tuple<Sprite, Color>>(); // Dictionary of key block type and sprite value;
+    Dictionary<BlockType, Tuple<Sprite, Color, BlockEffectCode, GameObject>> blockTypes = new Dictionary<BlockType, Tuple<Sprite, Color, BlockEffectCode, GameObject>>(); // Dictionary of key block type and sprite value;
     BlockType type; // Current type of block
+    BlockEffectCode effectCode;
 
     void Awake()
     {
@@ -21,7 +22,7 @@ public class BlockSprite : MonoBehaviour
     {
         foreach (TypeSprite type in spritesOfType)
         {
-            blockTypes.Add(type.type, new Tuple<Sprite, Color>(type.sprite, type.specialTint));
+            blockTypes.Add(type.type, new Tuple<Sprite, Color, BlockEffectCode, GameObject>(type.sprite, type.specialTint, type.effect, type.effectParticle));
         }
     }
 
@@ -53,11 +54,14 @@ public class BlockSprite : MonoBehaviour
         public BlockType type;
         public Sprite sprite;
         public Color specialTint;
+        public BlockEffectCode effect;
+        public GameObject effectParticle;
     }
 
     public int TypeCount { get => blockTypes.Count; }
     public BlockType Type { get => type; set { type = value; } }
-    public Dictionary<BlockType, Tuple<Sprite, Color>> BlockTypes { get => blockTypes; set => blockTypes = value; }
+    public Dictionary<BlockType, Tuple<Sprite, Color, BlockEffectCode, GameObject>> BlockTypes { get => blockTypes; }
+    public BlockEffectCode EffectCode { get => effectCode; }
 }
 
 /// <summary>

@@ -104,7 +104,7 @@ public class Grid : MonoBehaviour
         }
         else
         {
-            block.Sprite.SetType(BlockType.NONE);
+            block.Data.SetType(BlockType.NONE);
             newBlock.name = $"EMPTY [{x},{y}]";
         }
 
@@ -127,7 +127,7 @@ public class Grid : MonoBehaviour
         var adjBlocks = block.GetAdjacentBlocks();
         foreach (Block adjBlock in adjBlocks)
         {
-            if (block.Sprite.Type == adjBlock.Sprite.Type)
+            if (block.Data.Type == adjBlock.Data.Type)
             {
                 block.SetRandomBlockType();
                 MakeBlockHasNoAdjacentMatches(block);
@@ -264,7 +264,7 @@ public class Grid : MonoBehaviour
         int total = 0;
         foreach (Block block in this.blocks)
         {
-            if (block.Sprite.Type != BlockType.NONE)
+            if (block.Data.Type != BlockType.NONE)
             {
                 total++;
             }
@@ -278,12 +278,12 @@ public class Grid : MonoBehaviour
     /// <returns>Have enough block to play with?</returns>
     public bool RemainingBlocksHasEnoughTypeToMatch()
     {
-        foreach (BlockType type in blocks[0, 0].Sprite.BlockTypes.Keys)
+        foreach (BlockType type in blocks[0, 0].Data.BlockTypes.Keys)
         {
             int total = 0;
             foreach (Block block in blocks)
             {
-                if (block.Sprite.Type == type)
+                if (block.Data.Type == type)
                     total++;
                 if (total > 2)
                     return true;

@@ -94,7 +94,7 @@ public class BlocksMatcher : MonoBehaviour
         BeginSwappingBlocks?.Invoke();
         if (blockA.IsAdjacent(blockB))
         {
-            bool bothAandBNotEmpty = blockA.Sprite.Type != BlockType.NONE && blockB.Sprite.Type != BlockType.NONE;
+            bool bothAandBNotEmpty = blockA.Data.Type != BlockType.NONE && blockB.Data.Type != BlockType.NONE;
             SwapPositions(blockA, blockB);
 
             var blocksFromA = GetMatch(blockA);
@@ -110,8 +110,8 @@ public class BlocksMatcher : MonoBehaviour
                 if (blocksFromB.Count >= 4)
                     AddBlockToSpecial(blockB);
             }
-            else
-                SwapPositions(blockB, blockA);
+            //else
+            //SwapPositions(blockB, blockA);
         }
         blocksToSwap.Clear();
     }
@@ -141,9 +141,12 @@ public class BlocksMatcher : MonoBehaviour
         {
             for (int j = 0; j < grid.YDimension; j++)
             {
-                if (grid.Blocks[i, j].ClearableComponent != null && !matchedBlocks.Contains(grid.Blocks[i, j]))
+                Block block = grid.Blocks[i, j];
+                if (block.ClearableComponent != null && !matchedBlocks.Contains(block))
                 {
-                    List<Block> matches = GetMatch(grid.Blocks[i, j]);
+                    List<Block> matches = GetMatch(block);
+                    if (block.IsSpecial)
+                        AddFoundBlocksTo(matchedBlocks, block.Effect.GetBlocksUsingBlockEffect());
                     if (matches.Count >= 3)
                     {
                         AddFoundBlocksTo(matchedBlocks, matches);
@@ -186,7 +189,7 @@ public class BlocksMatcher : MonoBehaviour
         List<Block> matchingBlocks = new List<Block>();
         if (block.State == BlockState.NORMAL)
         {
-            BlockType type = block.Sprite.Type;
+            BlockType type = block.Data.Type;
             List<Block> horizontalBlocks = GetHorizontalBlocks(block);
             List<Block> verticalBlocks = GetVerticalBlocks(block);
 
@@ -203,7 +206,7 @@ public class BlocksMatcher : MonoBehaviour
     /// </summary>
     /// <param name="block">Chosen block</param>
     /// <returns></returns>
-    private List<Block> GetHorizontalBlocks(Block block)
+    public List<Block> GetHorizontalBlocks(Block block, bool getDifferentType = false)
     {
         List<Block> horizontalBlocks = new List<Block>();
 
@@ -221,7 +224,7 @@ public class BlocksMatcher : MonoBehaviour
     /// </summary>
     /// <param name="block">Chosen block</param>
     /// <returns></returns>
-    private List<Block> GetVerticalBlocks(Block block)
+    public List<Block> GetVerticalBlocks(Block block, bool getDifferentType = false)
     {
         List<Block> verticalBlocks = new List<Block>();
 
@@ -255,7 +258,7 @@ public class BlocksMatcher : MonoBehaviour
     /// Add the block to special blocks list.
     /// </summary>
     /// <param name="block">Block</param>
-    private void AddBlockToSpecial(Block block)
+    public void AddBlockToSpecial(Block block)
     {
         if (!specialBlocks.Contains(block))
             specialBlocks.Add(block);
@@ -271,7 +274,7 @@ public class BlocksMatcher : MonoBehaviour
     /// <param name="endX">The stopping X position</param>
     /// <param name="endY">The stopping Y position</param>
     /// <returns>Lists of found blocks.</returns>
-    private List<Block> GetBlocksInDirection(Block block, int xDir, int yDir, int endX, int endY)
+    public List<Block> GetBlocksInDirection(Block block, int xDir, int yDir, int endX, int endY, bool getDifferentType = false)
     {
         List<Block> blocks = new List<Block>();
         for (int i = block.X; i != endX + xDir; i += xDir)
@@ -279,8 +282,7 @@ public class BlocksMatcher : MonoBehaviour
             for (int j = block.Y; j != endY + yDir; j += yDir)
             {
                 Block foundBlock = grid.Blocks[i, j];
-                if ((foundBlock.Sprite.Type == BlockType.STAR || foundBlock.Sprite.Type == block.Sprite.Type)
-                    && !blocks.Contains(foundBlock))
+                if ((foundBlock.Data.Type == block.Data.Type || getDifferentType) && !blocks.Contains(foundBlock))
                 {
                     blocks.Add(foundBlock);
                 }
@@ -303,19 +305,19 @@ public class BlocksMatcher : MonoBehaviour
             var adjBlocks = block.GetAdjacentBlocks();
             foreach (Block adjBlock in adjBlocks)
             {
-                var ogType = adjBlock.Sprite.Type;
-                adjBlock.Sprite.Type = block.Sprite.Type;
-                block.Sprite.Type = ogType;
+                var ogType = adjBlock.Data.Type;
+                adjBlock.Data.Type = block.Data.Type;
+                block.Data.Type = ogType;
 
                 if (GetMatch(adjBlock).Count >= 3)
                 {
-                    block.Sprite.Type = adjBlock.Sprite.Type;
-                    adjBlock.Sprite.Type = ogType;
+                    block.Data.Type = adjBlock.Data.Type;
+                    adjBlock.Data.Type = ogType;
                     return true;
                 }
 
-                block.Sprite.Type = adjBlock.Sprite.Type;
-                adjBlock.Sprite.Type = ogType;
+                block.Data.Type = adjBlock.Data.Type;
+                adjBlock.Data.Type = ogType;
             }
         }
         Debug.Log("Don't have enough blocks to match");

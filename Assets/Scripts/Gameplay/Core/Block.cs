@@ -9,9 +9,10 @@ public class Block : MonoBehaviour
     private int y; // Y position of the block in the blocks array.
     private bool isSpecial; // True if this is a Star block.
     private Grid grid; // Grid that holds blocks' position data.
-    BlockState state; //Current state of a block
+    BlockState state; //Current state of a block\
+    BlockEffect effect;
 
-    BlockSprite blockSprite;
+    BlockData blockData;
     MoveableBlock moveableComponent;
     ClearableBlock clearableComponent;
 
@@ -23,7 +24,7 @@ public class Block : MonoBehaviour
     /// </summary>
     void Awake()
     {
-        blockSprite = GetComponent<BlockSprite>();
+        blockData = GetComponent<BlockData>();
         moveableComponent = GetComponent<MoveableBlock>();
         clearableComponent = GetComponent<ClearableBlock>();
     }
@@ -49,7 +50,7 @@ public class Block : MonoBehaviour
     /// <param name="block"></param>
     public void SetRandomBlockType()
     {
-        this.Sprite.SetType((BlockType)Random.Range(0, 7));
+        this.Data.SetType((BlockType)Random.Range(0, 7));
         this.gameObject.name = Name;
     }
 
@@ -61,9 +62,9 @@ public class Block : MonoBehaviour
     public void SetSpecialType()
     {
         SpriteRenderer sprite = GetComponentInChildren<SpriteRenderer>();
-        sprite.sprite = this.Sprite.BlockTypes[BlockType.STAR].Item1;
-        sprite.material.color = Sprite.GetSpecialTint();
-        GetComponent<BlockEffect>().PlaySpecialEffect();
+        sprite.sprite = this.Data.BlockTypes[BlockType.STAR].Item1;
+        sprite.material.color = Data.GetSpecialTint();
+        GetComponent<BlockVisualFX>().PlaySpecialEffect();
         isSpecial = true;
     }
 
@@ -162,13 +163,14 @@ public class Block : MonoBehaviour
     }
     public Grid Grid { get => grid; }
     public BlockState State { get => state; }
-    public BlockSprite Sprite { get => blockSprite; }
+    public BlockData Data { get => blockData; }
     public SpriteRenderer ChosenSprite { get => chosenSprite; }
-    public string Name { get => Sprite.Type.ToString() + $" [{x},{y}]"; }
+    public string Name { get => Data.Type.ToString() + $" [{x},{y}]"; }
     public bool IsSpecial { get => isSpecial; }
     public MoveableBlock MoveableComponent { get => moveableComponent; }
 
     public ClearableBlock ClearableComponent { get => clearableComponent; set => clearableComponent = value; }
+    public BlockEffect Effect { get => effect; set => effect = value; }
 }
 
 ///<summary>
