@@ -12,11 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9acc6e4f97365a4499ba73d16750eb18, type: 3}
   m_Name: GameSettings
   m_EditorClassIdentifier: 
-  Moves: 60
+  Moves: 10
   OneStarScore: 500
   TwoStarScore: 1250
   ThreeStarScore: 2000
   SpecialBlockBonus: 30
   Match3Point: 180
-  BonusAfter3Spree: 10
+  BonusAfter3Spree: 70
   TotalMatchesBonus: 30

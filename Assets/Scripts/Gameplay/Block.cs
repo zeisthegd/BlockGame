@@ -7,6 +7,7 @@ public class Block : MonoBehaviour
     public static bool CanPress = true; // Can the block be pressed or not? When refilling the board, stop the player from pressing the blocks.
     private int x; // X position of the block in the blocks array.
     private int y; // Y position of the block in the blocks array.
+    private bool isSpecial; // True if this is a Star block.
     private Grid grid; // Grid that holds blocks' position data.
     BlockState state; //Current state of a block
 
@@ -50,6 +51,20 @@ public class Block : MonoBehaviour
     {
         this.Sprite.SetType((BlockType)Random.Range(0, 7));
         this.gameObject.name = Name;
+    }
+
+    /// <summary>
+    /// Change the sprite to special sprite.
+    /// <br/> Change the tint color to match its fruit type.
+    /// <br/> Play the special effect.
+    /// </summary>
+    public void SetSpecialType()
+    {
+        SpriteRenderer sprite = GetComponentInChildren<SpriteRenderer>();
+        sprite.sprite = this.Sprite.BlockTypes[BlockType.STAR].Item1;
+        sprite.material.color = Sprite.GetSpecialTint();
+        GetComponent<BlockEffect>().PlaySpecialEffect();
+        isSpecial = true;
     }
 
     /// <summary>
@@ -149,8 +164,10 @@ public class Block : MonoBehaviour
     public BlockState State { get => state; }
     public BlockSprite Sprite { get => blockSprite; }
     public SpriteRenderer ChosenSprite { get => chosenSprite; }
-    public MoveableBlock MoveableComponent { get => moveableComponent; }
     public string Name { get => Sprite.Type.ToString() + $" [{x},{y}]"; }
+    public bool IsSpecial { get => isSpecial; }
+    public MoveableBlock MoveableComponent { get => moveableComponent; }
+
     public ClearableBlock ClearableComponent { get => clearableComponent; set => clearableComponent = value; }
 }
 

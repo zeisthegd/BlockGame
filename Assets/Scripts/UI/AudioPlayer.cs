@@ -21,6 +21,8 @@ public class AudioPlayer : MonoBehaviour
     [SerializeField] AudioClip clearSound;
     [SerializeField] AudioClip moveSound;
     [SerializeField] AudioClip uiClickSound;
+    [SerializeField] AudioClip starBlockMadeSound;
+
 
     Grid grid;
 
@@ -51,6 +53,7 @@ public class AudioPlayer : MonoBehaviour
     {
         grid.BlocksMatcher.BeginClearingBlocks += PlayClearSound;
         grid.BlocksMatcher.BeginSwappingBlocks += PlayMoveSound;
+        grid.BlocksMatcher.NewStarBlockMade += PlayStarBlockSound;
         DontDestroyOnLoad(this);
         PlayRandomBGM();
     }
@@ -62,6 +65,8 @@ public class AudioPlayer : MonoBehaviour
     {
         grid.BlocksMatcher.BeginClearingBlocks -= PlayClearSound;
         grid.BlocksMatcher.BeginSwappingBlocks -= PlayMoveSound;
+        grid.BlocksMatcher.NewStarBlockMade -= PlayStarBlockSound;
+
     }
 
     /// <summary>
@@ -97,6 +102,13 @@ public class AudioPlayer : MonoBehaviour
         PlaySFX(uiClickSound);
     }
 
+    /// <summary>
+    /// Play when a star block is made
+    /// </summary>
+    void PlayStarBlockSound()
+    {
+        PlaySFX(starBlockMadeSound);
+    }
     /// <summary>
     /// Play a clip
     /// </summary>

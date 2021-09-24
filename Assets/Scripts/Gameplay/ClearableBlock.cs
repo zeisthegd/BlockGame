@@ -15,10 +15,12 @@ public class ClearableBlock : MonoBehaviour
     [SerializeField] GameObject clearEffect; //The particle effect played when a block is cleared.
 
     Block block; // The block component
-    
+    BlockEffect blockEffect;
+
     void Awake()
     {
         block = GetComponent<Block>();
+        blockEffect = GetComponent<BlockEffect>();
     }
 
     /// <summary>
@@ -26,8 +28,8 @@ public class ClearableBlock : MonoBehaviour
     /// </summary>
     public void Clear()
     {
+        blockEffect.PlayClearEffect();
         StartCoroutine(ClearAnimationCoroutine());
-        StartCoroutine(PlayClearEffect());
     }
 
     /// <summary>
@@ -36,38 +38,9 @@ public class ClearableBlock : MonoBehaviour
     IEnumerator ClearAnimationCoroutine()
     {
         animator.Play(clearAnim.name);
-        yield return new WaitForSeconds(clearAnim.length);
-    }
-
-    /// <summary>
-    /// Play clear particle effect.
-    /// </summary>
-    IEnumerator PlayClearEffect()
-    {
-        List<ParticleSystem> clearEffect = GetClearParticles();
-        foreach (ParticleSystem particle in clearEffect)
-        {
-            particle.Play();
-        }
-
-        yield return new WaitForSeconds(.3F);
+        yield return new WaitForSeconds(clearAnim.length / 2F);
         Destroy(block.gameObject);
         block.Grid.SpawnNewBlock(block.X, block.Y, BlockState.EMPTY);
     }
 
-    /// <summary>
-    /// Get the particle effect from a prefabs.
-    /// </summary>
-    /// <returns>List of particle effects</returns>
-    List<ParticleSystem> GetClearParticles()
-    {
-        List<ParticleSystem> particles = new List<ParticleSystem>();
-        var _clearEffect = Instantiate(clearEffect, transform.position, Quaternion.identity, this.transform);
-        for (int i = 0; i < clearEffect.transform.childCount; i++)
-        {
-            if (clearEffect.transform.GetChild(i).gameObject.GetComponent<ParticleSystem>())
-                particles.Add(clearEffect.transform.GetChild(i).gameObject.GetComponent<ParticleSystem>());
-        }
-        return particles;
-    }
 }

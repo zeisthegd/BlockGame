@@ -70,7 +70,7 @@ SpriteRenderer:
   m_SortingLayerID: 1131726885
   m_SortingLayer: 3
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 08d7d2578ab259d408344b41d7d40fb6, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 41594ab2f8c9b3341aea87370ad06220, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -94,6 +94,7 @@ GameObject:
   - component: {fileID: 664888183}
   - component: {fileID: 5238981085539031020}
   - component: {fileID: 728200789910253972}
+  - component: {fileID: 949728165839426617}
   - component: {fileID: 1562237940}
   - component: {fileID: 168795661}
   m_Layer: 0
@@ -144,23 +145,31 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 552d5620a4e31264e8d6d7ccd22de433, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  typeSprites:
+  spritesOfType:
   - type: 0
     sprite: {fileID: 21300000, guid: 08d7d2578ab259d408344b41d7d40fb6, type: 3}
+    specialTint: {r: 0.9411765, g: 0.25490198, b: 0.27450982, a: 1}
   - type: 1
     sprite: {fileID: 21300000, guid: dfd761479895e3a47a680471adcaa4d6, type: 3}
+    specialTint: {r: 0.72156864, g: 0.65882355, b: 0.5568628, a: 1}
   - type: 2
     sprite: {fileID: 21300000, guid: 2d5b2b79dbd20b54ca90c33f0443f11b, type: 3}
+    specialTint: {r: 1, g: 0.6666667, b: 0.023529412, a: 1}
   - type: 3
     sprite: {fileID: 21300000, guid: 33a3ad1ada27e1d4091690fc693ed1b7, type: 3}
+    specialTint: {r: 0.5411765, g: 0.003921569, b: 0, a: 1}
   - type: 4
     sprite: {fileID: 21300000, guid: 63b689c5b11b825479b8887460784b9d, type: 3}
+    specialTint: {r: 0.9137255, g: 0.41939917, b: 0.17254898, a: 1}
   - type: 5
     sprite: {fileID: 21300000, guid: 2a18be2efa29d4a419b04835fa2e332d, type: 3}
+    specialTint: {r: 0.40784314, g: 0.5372549, b: 0.1882353, a: 1}
   - type: 6
     sprite: {fileID: 21300000, guid: 8128323166df6ef4cbd86bc1bda872a7, type: 3}
+    specialTint: {r: 1, g: 0.593535, b: 0.23113209, a: 1}
   - type: 7
-    sprite: {fileID: 21300000, guid: cf2333daa45218f46a26a1fb2c0776b0, type: 3}
+    sprite: {fileID: 21300000, guid: 41594ab2f8c9b3341aea87370ad06220, type: 3}
+    specialTint: {r: 0.047169805, g: 0.00244749, b: 0.00244749, a: 1}
 --- !u!114 &5238981085539031020
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -189,6 +198,22 @@ MonoBehaviour:
   clearAnim: {fileID: 7400000, guid: e7661588a9d89ff409a45b50023accfb, type: 2}
   animator: {fileID: 168795661}
   clearEffect: {fileID: 8420273520918717646, guid: cea70bea4f818e842ae8293c57e3123d,
+    type: 3}
+--- !u!114 &949728165839426617
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3538465612510538860}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 142813fc1ac141e47b4f64eeb4db5a70, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  clearEffect: {fileID: 8420273520918717646, guid: cea70bea4f818e842ae8293c57e3123d,
+    type: 3}
+  specialEffect: {fileID: 8420273520918717646, guid: 9e1248eee59a4f645878602c42ed8bcc,
     type: 3}
 --- !u!61 &1562237940
 BoxCollider2D:

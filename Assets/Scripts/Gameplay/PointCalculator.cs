@@ -112,7 +112,7 @@ public class PointCalculator : MonoBehaviour
 
         foreach (Block block in blocks)
         {
-            hasSpecialBlock = block.Sprite.Type == BlockType.STAR ? true : hasSpecialBlock;
+            hasSpecialBlock = block.IsSpecial == true ? true : hasSpecialBlock;
             if ((block.Sprite.Type != lastType && block.Sprite.Type != BlockType.STAR) || blocks.IndexOf(block) == blocks.Count - 1)
             {
                 totalMatches++;

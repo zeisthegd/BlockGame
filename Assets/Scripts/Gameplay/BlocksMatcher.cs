@@ -20,6 +20,7 @@ public class BlocksMatcher : MonoBehaviour
 
     public event UnityAction BeginClearingBlocks;// Called when there are matches to clear.
     public event UnityAction BeginSwappingBlocks;// Called when 2 blocks is swapped.
+    public event UnityAction NewStarBlockMade;// Called a star block is formed.
 
     void Awake()
     {
@@ -165,12 +166,13 @@ public class BlocksMatcher : MonoBehaviour
         /// Change the blocks in specialblocks to the special type.
         foreach (Block block in specialBlocks)
         {
-            block.Sprite.SetType(BlockType.STAR);
+            block.SetSpecialType();
+            NewStarBlockMade?.Invoke();
         }
 
         matchedBlocks.Clear();
         specialBlocks.Clear();
-        
+
         return cleared;
     }
 

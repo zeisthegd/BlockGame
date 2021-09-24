@@ -1,11 +1,12 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class BlockSprite : MonoBehaviour
 {
-    [SerializeField] TypeSprite[] typeSprites; //This field is to easily set up types and their sprite by drag and drop in the editor.
-    Dictionary<BlockType, Sprite> blockTypes = new Dictionary<BlockType, Sprite>(); // Dictionary of key block type and sprite value;
+    [SerializeField] TypeSprite[] spritesOfType; //This field is to easily set up types and their sprite by drag and drop in the editor.
+    Dictionary<BlockType, Tuple<Sprite, Color>> blockTypes = new Dictionary<BlockType, Tuple<Sprite, Color>>(); // Dictionary of key block type and sprite value;
     BlockType type; // Current type of block
 
     void Awake()
@@ -18,9 +19,9 @@ public class BlockSprite : MonoBehaviour
     /// </summary>
     void InitializeBlockTypeDictionary()
     {
-        foreach (TypeSprite type in typeSprites)
+        foreach (TypeSprite type in spritesOfType)
         {
-            blockTypes.Add(type.type, type.sprite);
+            blockTypes.Add(type.type, new Tuple<Sprite, Color>(type.sprite, type.specialTint));
         }
     }
 
@@ -32,24 +33,31 @@ public class BlockSprite : MonoBehaviour
     {
         this.type = type;
         SpriteRenderer sprite = GetComponentInChildren<SpriteRenderer>();
-        if (blockTypes.ContainsKey(type))
-            sprite.sprite = blockTypes[type];
+        if (blockTypes.ContainsKey(type) && !GetComponent<Block>().IsSpecial)
+            sprite.sprite = blockTypes[type].Item1;
+
+    }
+
+    public Color GetSpecialTint()
+    {
+        return blockTypes[this.type].Item2;
     }
 
 
     /// <summary>
-    /// Struct hold the Block Type and its sprite.
+    /// Struct hold the Block Type and its sprite. Type's Sprite
     /// </summary>    
     [System.Serializable]
-    struct TypeSprite
+    public struct TypeSprite
     {
         public BlockType type;
         public Sprite sprite;
+        public Color specialTint;
     }
 
     public int TypeCount { get => blockTypes.Count; }
-    public BlockType Type { get => type; set { SetType(value); } }
-    public Dictionary<BlockType, Sprite> BlockTypes { get => blockTypes; set => blockTypes = value; }
+    public BlockType Type { get => type; set { type = value; } }
+    public Dictionary<BlockType, Tuple<Sprite, Color>> BlockTypes { get => blockTypes; set => blockTypes = value; }
 }
 
 /// <summary>
