@@ -27,6 +27,7 @@ public class Block : MonoBehaviour
         blockData = GetComponent<BlockData>();
         moveableComponent = GetComponent<MoveableBlock>();
         clearableComponent = GetComponent<ClearableBlock>();
+        effect = GetComponent<BlockEffect>();
     }
 
     /// <summary>
@@ -59,7 +60,7 @@ public class Block : MonoBehaviour
     /// <br/> Change the tint color to match its fruit type.
     /// <br/> Play the special effect.
     /// </summary>
-    public void SetSpecialType()
+    public void MakeSpecialType()
     {
         SpriteRenderer sprite = GetComponentInChildren<SpriteRenderer>();
         sprite.sprite = this.Data.BlockTypes[BlockType.STAR].Item1;

@@ -109,9 +109,10 @@ public class BlocksMatcher : MonoBehaviour
                     AddBlockToSpecial(blockA);
                 if (blocksFromB.Count >= 4)
                     AddBlockToSpecial(blockB);
+
             }
-            //else
-            //SwapPositions(blockB, blockA);
+            else
+                SwapPositions(blockB, blockA);
         }
         blocksToSwap.Clear();
     }
@@ -145,8 +146,6 @@ public class BlocksMatcher : MonoBehaviour
                 if (block.ClearableComponent != null && !matchedBlocks.Contains(block))
                 {
                     List<Block> matches = GetMatch(block);
-                    if (block.IsSpecial)
-                        AddFoundBlocksTo(matchedBlocks, block.Effect.GetBlocksUsingBlockEffect());
                     if (matches.Count >= 3)
                     {
                         AddFoundBlocksTo(matchedBlocks, matches);
@@ -159,22 +158,9 @@ public class BlocksMatcher : MonoBehaviour
         }
         if (matchedBlocks.Count >= 3)
             BeginClearingBlocks?.Invoke();
-
-        /// Clear all matches.
-        foreach (Block block in matchedBlocks)
-        {
-            if (!specialBlocks.Contains(block))
-                block.ClearableComponent.Clear();
-        }
-        /// Change the blocks in specialblocks to the special type.
-        foreach (Block block in specialBlocks)
-        {
-            block.SetSpecialType();
-            NewStarBlockMade?.Invoke();
-        }
-
-        matchedBlocks.Clear();
-        specialBlocks.Clear();
+        GetBlocksFromSpecialBlocks();
+        ClearAllBlocksFromMatchedBlocks();
+        MakeAllBlocksFromSpecialBecomeStarBlock();
 
         return cleared;
     }
@@ -205,14 +191,15 @@ public class BlocksMatcher : MonoBehaviour
     /// Get all blocks of the same type of the chosen blocks in 2 directions: Left and Right.
     /// </summary>
     /// <param name="block">Chosen block</param>
+    /// <param name="getDifferentType">Do you want to get blocks of different type?</param>
     /// <returns></returns>
     public List<Block> GetHorizontalBlocks(Block block, bool getDifferentType = false)
     {
         List<Block> horizontalBlocks = new List<Block>();
 
         horizontalBlocks.Add(block);
-        var leftBlocks = GetBlocksInDirection(block, checkDirections[0], checkDirections[0], 0, block.Y);
-        var rightBlocks = GetBlocksInDirection(block, checkDirections[1], checkDirections[1], grid.XDimension - 1, block.Y);
+        var leftBlocks = GetBlocksInDirection(block, checkDirections[0], checkDirections[0], 0, block.Y, getDifferentType);
+        var rightBlocks = GetBlocksInDirection(block, checkDirections[1], checkDirections[1], grid.XDimension - 1, block.Y, getDifferentType);
 
         AddFoundBlocksTo(horizontalBlocks, leftBlocks);
         AddFoundBlocksTo(horizontalBlocks, rightBlocks);
@@ -223,14 +210,15 @@ public class BlocksMatcher : MonoBehaviour
     /// Get all blocks of the same type of the chosen blocks in 2 directions: Up and Down.
     /// </summary>
     /// <param name="block">Chosen block</param>
+    /// <param name="getDifferentType">Do you want to get blocks of different type?</param>
     /// <returns></returns>
     public List<Block> GetVerticalBlocks(Block block, bool getDifferentType = false)
     {
         List<Block> verticalBlocks = new List<Block>();
 
         verticalBlocks.Add(block);
-        var belowBlocks = GetBlocksInDirection(block, checkDirections[0], checkDirections[0], block.X, 0);
-        var aboveBlocks = GetBlocksInDirection(block, checkDirections[1], checkDirections[1], block.X, grid.YDimension - 1);
+        var belowBlocks = GetBlocksInDirection(block, checkDirections[0], checkDirections[0], block.X, 0, getDifferentType);
+        var aboveBlocks = GetBlocksInDirection(block, checkDirections[1], checkDirections[1], block.X, grid.YDimension - 1, getDifferentType);
 
         AddFoundBlocksTo(verticalBlocks, belowBlocks);
         AddFoundBlocksTo(verticalBlocks, aboveBlocks);
@@ -245,12 +233,46 @@ public class BlocksMatcher : MonoBehaviour
     /// <param name="otherBlocks">Other list</param>
     private void AddFoundBlocksTo(List<Block> blockLists, List<Block> otherBlocks)
     {
-        foreach (Block block in otherBlocks)
+        if (otherBlocks != null)
         {
-            if (!blockLists.Contains(block))
+            foreach (Block block in otherBlocks)
             {
-                blockLists.Add(block);
+                if (!blockLists.Contains(block))
+                {
+                    blockLists.Add(block);
+                }
             }
+        }
+    }
+
+    private void ClearAllBlocksFromMatchedBlocks()
+    {
+        foreach (Block block in matchedBlocks)
+        {
+            if (!specialBlocks.Contains(block))
+                block.ClearableComponent.Clear();
+        }
+        matchedBlocks.Clear();
+    }
+
+    private void MakeAllBlocksFromSpecialBecomeStarBlock()
+    {
+        /// Change the blocks in specialblocks to the special type.
+        foreach (Block block in specialBlocks)
+        {
+            block.MakeSpecialType();
+            NewStarBlockMade?.Invoke();
+        }
+        specialBlocks.Clear();
+    }
+
+    private void GetBlocksFromSpecialBlocks()
+    {
+        for (int i = 0; i < matchedBlocks.Count; i++)
+        {
+            if (matchedBlocks[i].IsSpecial)
+                UseSpecialTypeEffect(matchedBlocks[i]);
+
         }
     }
 
@@ -264,6 +286,12 @@ public class BlocksMatcher : MonoBehaviour
             specialBlocks.Add(block);
     }
 
+    private void UseSpecialTypeEffect(Block block)
+    {
+        if (block.IsSpecial)
+            AddFoundBlocksTo(matchedBlocks, block.Effect.GetBlocksUsingBlockEffect());
+    }
+
 
     /// <summary>
     /// Get blocks of the same type of a chosen block in 1 direction.
@@ -273,6 +301,7 @@ public class BlocksMatcher : MonoBehaviour
     /// <param name="yDir">Y direction</param>
     /// <param name="endX">The stopping X position</param>
     /// <param name="endY">The stopping Y position</param>
+    /// <param name="getDifferentType">Do you want to get blocks of different type?</param>
     /// <returns>Lists of found blocks.</returns>
     public List<Block> GetBlocksInDirection(Block block, int xDir, int yDir, int endX, int endY, bool getDifferentType = false)
     {
@@ -283,9 +312,7 @@ public class BlocksMatcher : MonoBehaviour
             {
                 Block foundBlock = grid.Blocks[i, j];
                 if ((foundBlock.Data.Type == block.Data.Type || getDifferentType) && !blocks.Contains(foundBlock))
-                {
                     blocks.Add(foundBlock);
-                }
                 else
                     return blocks;
             }

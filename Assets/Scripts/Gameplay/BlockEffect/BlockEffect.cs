@@ -7,19 +7,34 @@ public class BlockEffect : MonoBehaviour
     protected Block block;
     protected BlocksMatcher blocksMatcher;
 
-    public virtual List<Block> GetBlocksUsingBlockEffect() { return null; }
-
-    public static BlockEffect CreateNewBlockEffect(BlockEffectCode code, Block block)
+    void Start()
     {
-        BlockEffect newEffect = new NoEffect();
-        switch (code)
+        block = GetComponent<Block>();
+        blocksMatcher = FindObjectOfType<BlocksMatcher>();
+    }
+
+    public List<Block> GetBlocksUsingBlockEffect()
+    {
+        List<Block> foundBlocks = new List<Block>();
+        switch (block.Data.Type)
         {
-            case BlockEffectCode.ClearHorizontalLine:
+            case BlockType.PUMPKIN:
+                foundBlocks = FindAllHorizontalBlocks();
                 break;
-            case BlockEffectCode.ClearVerticalLine:
+            case BlockType.AVOCADO:
+                foundBlocks = FindAllVerticalBlocks();
                 break;
         }
-        return newEffect;
+        return foundBlocks;
+    }
+
+    private List<Block> FindAllHorizontalBlocks()
+    {
+        return blocksMatcher.GetHorizontalBlocks(block, true);
+    }
+    private List<Block> FindAllVerticalBlocks()
+    {
+        return blocksMatcher.GetVerticalBlocks(block, true);
     }
 }
 
